@@ -1,11 +1,11 @@
-%create bipolar montage for grid 5x4 and bids
-
+%create bipolar montage for grid 5x4 on the transversal direction 
+% INPUT
 % ch_label - channel names 
 % data     - (ch X samples) data matrix 
-
+% OUTPUT
 % grid2use - grid labels available for which it was possible to compute the
 %            bipolar montage
-% outdata  - bipolar trasformation for the grid (i.e Gr1-Gr2)
+% outdata  - bipolar trasformation for the grid (i.e Gr1-Gr6) (channel X time sample)
 function [grid2use,outdata]=create_bipolar_montage_5by4Y(ch_label,data)
 
 % extract grid channels
@@ -26,7 +26,7 @@ if(any(grid_idx))
     grid_label   = grid_label(reindex);
     data         = data(reindex,:);
 
-    %check for which channel is possible to compute the laplacian
+  
 
 
     montage = [  1 6   ;...
@@ -107,20 +107,4 @@ else
     grid2use = []; 
     outdata  = [];
 end
-% figure;imagesc(montage2use)
-% xticks(1:size(montage2use,2))
-% yticks(1:size(montage2use,1))
-% xticklabels(grid_label)
-% xtickangle(45)
-% yticklabels(grid2use)
-% ytickangle(45)
-label    = regexpi(grid2use,'(?<startStr>Gr)(?<first>\d*)(?<N1>N?)-(?<N2>N?)(?<endStr>Gr)(?<second>\d*)','names');
-twoDigit = @(x) {sprintf('%02.0f',str2num(x.first)); sprintf('%02.0f',str2num(x.second))};
 
-padded   = cellfun(twoDigit,label,'UniformOutput',false);
-new_label = cell(size(grid2use));
-for i = 1 : numel(label)
-   
-    new_label{i} = strcat(label{i}.startStr,padded{i}{1},label{i}.N1,'-',label{i}.N2,label{i}.endStr,padded{i}{end}); 
-end
-grid2use = new_label;

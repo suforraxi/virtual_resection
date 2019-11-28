@@ -1,11 +1,11 @@
-%create bipolar montage for strip and bids
-
+% create bipolar montage for strip 
+% INPUT
 % ch_label - channel names 
 % data     - (ch X samples) data matrix 
-
+% OUTPUT
 % strip2use - strip labels available for which it was possible to compute
 %             the bipolar montage
-% outdata   - bipolar trasformation for the strip (i.e Str1-Str2)
+% outdata   - bipolar trasformation for the strip (i.e Str1-Str2) (channel X time sample)
 function [strips2use,outdata]=create_bipolar_montage_strip(ch_label,data)
 
 
@@ -14,8 +14,9 @@ addhyphen = @(x) [x '-'];
 strip2use = {};
 outdata   = [];
 
-% look for strip names
+% look for strip names, possible strip prefix are
 strip_names  = {'Str','Rst','Riv','St','StrB','Sst','S1-'};
+
 
 lookup4strip = regexpi(ch_label,'(Str|Rst|Riv|St|StrB|Sst|S1-)\d+');
 strip_idx    = ~cell2mat(cellfun(@isempty,lookup4strip,'UniformOutput',false));
@@ -76,12 +77,12 @@ if(any(strip_idx))
 
                 if(sum(chAvailable) == numel(c_mont)) %all required channels are present
 
-                    %curr_ch_idx                        = strcmp( strip_label , ch2check{1}); 
+                   
                     chAvailable(curr_ch_idx) = 0;
                     montage_M(i,chAvailable) = -1;
                     montage_M(i,curr_ch_idx) = 1; 
 
-                    %label2add = cellfun(addhyphen,strip_label,'UniformOutput',false);
+                
                     strip2use{i,1} = strcat(ch2check{1},'-',ch2check{end});
                 else
                     montage_M(i,:) = 0;
@@ -103,16 +104,5 @@ else
 end
 
 
-for k = 1 : size(strips2use,2)
-    c_strip  = strips2use{k};
-    label    = regexpi(c_strip,'(?<startStr>(Str|Rst|Riv|St|StrB|Sst|S1-))(?<first>\d*)(?<N1>N?)-(?<N2>N?)(?<endStr>(Str|Rst|Riv|St|StrB|Sst|S1-))(?<second>\d*)','names');
-    twoDigit = @(x) {sprintf('%02.0f',str2num(x.first)); sprintf('%02.0f',str2num(x.second))};
 
-    padded   = cellfun(twoDigit,label,'UniformOutput',false);
-    new_label = cell(size(c_strip));
-    for i = 1 : numel(label)
 
-        new_label{i} = strcat(label{i}.startStr,padded{i}{1},label{i}.N1,'-',label{i}.N2,label{i}.endStr,padded{i}{end}); 
-    end
-    strips2use{k} = new_label;
-end
