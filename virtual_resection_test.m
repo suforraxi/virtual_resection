@@ -43,6 +43,20 @@ cfgPre.detrend = 'yes';
 cfgPre.trial   = 'all';
 m_data         = ft_preprocessing(cfgPre,m_data);
 
+%% filter
+%cfgPre           = [];
+%cfgPre.bpfilter  = 'yes';
+%cfgPre.bpfreq    = [20 80];
+%m_data          = ft_preprocessing(cfgPre,m_data);
+
+
+
+% select three channels
+cfgCH.channel                  =  {'Gr01-Gr02','Gr01-Gr06','Gr04-Gr05'};
+m_data                         = ft_preprocessing(cfgCH,m_data);  
+
+
+
 
 %% view data
 cfg           = [];
