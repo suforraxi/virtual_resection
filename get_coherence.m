@@ -4,8 +4,11 @@
 % mEnv  - time-series matrix (channel X timesample) 
 %
 % OUTPUT
+% C     - correlation matrix
 % coh   - coherence as the weighted ratio of eigenvalues 
-function coh = get_coherence(mEnv)
+% V     - eigenvectors matrix
+% E     - eigenvalues  matrix
+function [coh, C, V, E] = get_coherence(mEnv)
 % zero mean
 x = (mEnv-repmat(mean(mEnv,2),[1 size(mEnv,2)]))';
 % correlation matrix
