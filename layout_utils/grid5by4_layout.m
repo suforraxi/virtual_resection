@@ -1,5 +1,6 @@
 %% create a layout for a 5 by 4 grid
 
+load('m_data')
 w = 1.4;
 h = 0.7;
 [x1,y1] = ndgrid(2:2:9,1:2:7);
