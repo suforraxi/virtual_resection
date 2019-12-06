@@ -1,18 +1,15 @@
 % compute coherence using a weighted ratio (accouting for spatial distribution) of eigenvalues 
 %
 % INPUT
-% mEnv  - time-series matrix (channel X timesample) 
+%
+% C     - symmetric functional connectivity matrix 
 %
 % OUTPUT
-% C     - correlation matrix
-% coh   - coherence as the weighted ratio of eigenvalues 
+% 
+% coh   - coherence as the ratio of weighted (using eigenvectors) eigenvalues 
 % V     - eigenvectors matrix
 % E     - eigenvalues  matrix
-function [coh, C, V, E] = get_coherence(mEnv)
-% zero mean
-x = (mEnv-repmat(mean(mEnv,2),[1 size(mEnv,2)]))';
-% correlation matrix
-C = corr(x);
+function [coh, V, E] = get_coherence(C)
 
 % eigen-value decopmposition
 [V,E] = eig(C); 
@@ -29,3 +26,4 @@ f    = E*(mean(V.^2)./max(V.^2))';
 %  end
 %  
 coh = max(f)/sum(f);
+
