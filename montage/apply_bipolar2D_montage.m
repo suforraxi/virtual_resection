@@ -41,11 +41,24 @@ for i = 1: ntrial
     end
     
 end
+
+stripLabel = [];
+stripData  = [];
+allStrip   = strip;
 for i = 1: ntrial
     
-    [strip.label,strip.trial{i}] = create_bipolar_montage_strip(strip.label,strip.trial{i});
+    [stripLabel,stripData] = create_bipolar_montage_strip(strip.label,strip.trial{i});
     
-    if(isempty(strip.trial{i}))
+    auxStripL  = [];
+    auxStripD  = [];
+    for j = 1 : numel(stripData) 
+        auxStripD = [auxStripD; stripData{j}];
+        auxStripL = [auxStripL; stripLabel{j}];
+    end
+    allStrip.trial{i} = auxStripD;
+    allStrip.label    = auxStripL;
+    
+    if(isempty(allStrip.trial{i}))
         strip = [];
         break
     end
@@ -53,4 +66,4 @@ for i = 1: ntrial
 end
 
 outdata = merge_dataset(gridX,gridY);
-outdata = merge_dataset(outdata,strip);
+outdata = merge_dataset(outdata,allStrip);
