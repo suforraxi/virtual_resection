@@ -7,8 +7,8 @@ addpath('/home/matteo/Desktop/git_rep/epi/matlab/episign/biomarker_pipeline/')
 addpath('/home/matteo/Desktop/git_rep/epi/matlab/stiliyan/matLabTools/');
 
 bidsFolder = '/home/matteo/Desktop/tle_e/converted/';
-sitFolder  = '/home/matteo/Desktop/tle_e/converted/sub-RESP0465/ses-SITUATION1A/ieeg/';
-sitFName   = 'sub-RESP0465_ses-SITUATION1A_task-acute_ieeg';
+sitFolder  = '/home/matteo/Desktop/tle_e/converted/sub-RESP0619/ses-SITUATION2A/ieeg/';
+sitFName   = 'sub-RESP0619_ses-SITUATION2A_task-acute_ieeg';
 % read data
 
 [status,msg,cfg,data] = importBidsData(sitFolder);
@@ -43,31 +43,32 @@ cfgPre.detrend = 'yes';
 cfgPre.trial   = 'all';
 m_data         = ft_preprocessing(cfgPre,m_data);
 
-%% filter
-%cfgPre           = [];
-%cfgPre.bpfilter  = 'yes';
-%cfgPre.bpfreq    = [20 80];
-%m_data          = ft_preprocessing(cfgPre,m_data);
-
 
 
 % select three channels
-cfgCH.channel                  =  {'Gr01-Gr02','Gr01-Gr06','Gr04-Gr05'};
-m_data                         = ft_preprocessing(cfgCH,m_data);  
+%cfgCH.channel                  =  {'Gr01-Gr02','Gr01-Gr06','Gr04-Gr05'};
+%m_data                         = ft_preprocessing(cfgCH,m_data);  
 
 
 
 
 %% view data
-cfg           = [];
-cfg.viewmode  = 'vertical';  
-cfg.blocksize = 15;
-cfg.seldat    = 'current';
+% cfg           = [];
+% cfg.viewmode  = 'vertical';  
+% cfg.blocksize = 15;
+% cfg.seldat    = 'current';
+% 
+% ft_databrowser(cfg,m_data)
 
-ft_databrowser(cfg,m_data)
-
-
-
+% compute coherence
+nTrial = numel(m_data.trial);
+for i = 1 : nTrial 
+    mEnv            = get_Envelope(m_data.trial{i});
+    m_data.trial{i} = mEnv;
+    [coh, C, V, E] = get_coherence(mEnv);
+    
+    plot_AC(m_data,coh,C,V)
+end
 
 
 

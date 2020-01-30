@@ -1,4 +1,4 @@
-% compute coherence using a weighted ratio (accouting for spatial distribution) of eigenvalues 
+% compute global coherence using a weighted ratio (accounting for spatial distribution) of eigenvalues 
 %
 % INPUT
 %
@@ -6,7 +6,7 @@
 %
 % OUTPUT
 % 
-% coh   - coherence as the ratio of weighted (using eigenvectors) eigenvalues 
+% coh   - global coherence as the ratio of weighted (using eigenvectors) eigenvalues 
 % V     - eigenvectors matrix
 % E     - eigenvalues  matrix
 function [coh, V, E] = get_coherence(C)
