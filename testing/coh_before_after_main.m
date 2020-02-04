@@ -40,14 +40,14 @@ for i = 1: numel(subjName)
         
         sit_res = out{s};
         
-        save(fullfile(outFolder,'coh',strcat('sub-',subjName{i},'_','ses-',sit_res.sitName)),'sit_res');
+        save(fullfile(outFolder,'coh',strcat('sub-',subjName{i},'_','ses-',sit_res{1}.sitName)),'sit_res');
         
-        rTbl = [rTbl; create_table(sit_res) ];
+        %rTbl = [rTbl; create_table(sit_res) ];
         
     end
 end
 
-save(fullfile(outFolder,'tables','summary_tbl_coh'),'rTbl');
+%save(fullfile(outFolder,'tables','summary_tbl_coh'),'rTbl');
 
 function out = coh_before_after(cfg)
 
@@ -107,12 +107,22 @@ for s = 1 : numel(situationName)
                 m_data                         = ft_preprocessing(cfgCH,m_data);  
                 
                 %% redefine trials
-%                 cfgReTrials.trials  = 'all';
-%                 cfgReTrials.length  = 5; %seconds of new trials
-%                 cfgReTrials.overlap = 0;
-% 
-%                 m_data = ft_redefinetrial(cfgReTrials,m_data);
-%                 
+                 cfgReTrials.trials  = 'all';
+                 cfgReTrials.length  = 20; %seconds of new trials
+                 cfgReTrials.overlap = 0.5;
+ 
+                 m_data = ft_redefinetrial(cfgReTrials,m_data);
+               
+                %% remove power line (50Hz)
+                %cfgNotch.bsfilter = 'yes';
+                %cfgNotch.bsfreq   = [49 51];
+                %cfgNotch.trial    = 'all';
+                
+                cfgNotch.dftfilter = 'yes';
+                cfgNotch.dftfreq   = [50 100 150];
+                cfgNotch.trial    = 'all';
+                
+                m_data = ft_preprocessing(cfgNotch,m_data);
                 
                 %% detrend demean
                 
@@ -120,7 +130,7 @@ for s = 1 : numel(situationName)
                 cfgPre.detrend  = 'yes';
                 cfgPre.trial    = 'all';
                 cfgPre.bpfilter = 'yes';
-                cfgPre.bpfreq   = [20 120];
+                cfgPre.bpfreq   = [5   150];
 
                 m_data         = ft_preprocessing(cfgPre,m_data);
 
@@ -128,51 +138,56 @@ for s = 1 : numel(situationName)
                 % compute envelope and coherence
                 nTrial = numel(m_data.trial);
                 o      = []; % struct with the result for situation
+                for t = 1 : nTrial
+                %if(nTrial == 1 )      
 
-                if(nTrial == 1 )      
-
-                    mEnv            = get_Envelope(m_data.trial{1});
+                    mEnv            = get_Envelope(m_data.trial{t});
                     C               = fc(mEnv);
-                    m_data.trial{1} = mEnv;
+                    m_data.trial{t} = mEnv;
                     [coh, V, E]     = get_coherence(C);
-
-                    o.coh      = coh;
-                    o.C        = C;
-                    o.V        = V;
-                    o.E        = E;
-                    o.sitFName = sitFName;
-                    o.subjName = subjName; 
-                    o.sitName  = situationName{s};
-                    o.so       = seizOut;
+                    
+                    o{t}.band     = cfgPre.bpfreq; 
+                    o{t}.epoch    = cfgReTrials.length;
+                    o{t}.overlap  = cfgReTrials.overlap;
+                    o{t}.coh      = coh;
+                    o{t}.C        = C;
+                    o{t}.V        = V;
+                    o{t}.E        = E;
+                    o{t}.sitFName = sitFName;
+                    o{t}.subjName = subjName; 
+                    o{t}.sitName  = situationName{s};
+                    o{t}.so       = seizOut;
+                end
+                for t = 1 : nTrial % virtual resection
                     if(pre(s))
-                        o.sitType = 'Pre';
+                        o{t}.sitType = 'Pre';
                         % virtual resection
                         if(numel(res_channel) > 0) % there are resected channels
                             
                             for r = 1 :numel(res_channel)
-                                mono_ch = res_channel{r};
+                                 mono_ch = res_channel{r};
                                  idx2rm  = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
                                 while(~isempty(idx2rm))
                                      m_data = remove_ch(m_data,idx2rm(1));
                                      idx2rm = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
                                 end
-                                C           = fc(m_data.trial{1});
-                                [coh, V, E] = get_coherence(C);
-                                o.Vcoh      = coh;
-                                o.VC        = C;
-                                o.VV        = V;
-                                o.VE        = E;
+                                C              = fc(m_data.trial{t});
+                                [coh, V, E]    = get_coherence(C);
+                                o{t}.Vcoh      = coh;
+                                o{t}.VC        = C;
+                                o{t}.VV        = V;
+                                o{t}.VE        = E;
                                 
                             end
                                             
                         end 
                     elseif(post(s))
-                        o.sitType = 'Post';
+                        o{t}.sitType = 'Post';
                        
-                        o.Vcoh      = NaN;
-                        o.VC        = NaN;
-                        o.VV        = NaN;
-                        o.VE        = NaN;
+                        o{t}.Vcoh      = NaN;
+                        o{t}.VC        = NaN;
+                        o{t}.VV        = NaN;
+                        o{t}.VE        = NaN;
                     end
                 end
                 

@@ -17,6 +17,6 @@ function d = remove_ch(d,idx_ch)
         m          = d.trial{i};
         m          = get_ortho_matrix(m,idx_ch);
         d.trial{i} = m;
-        d.label    = d.label(idx);   
-        
+          
     end
+     d.label    = d.label(idx); 
