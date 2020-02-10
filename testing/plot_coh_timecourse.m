@@ -45,18 +45,22 @@ for s = 1: numel(subjNames)
 end
 
 % plot synchronizability
-fig = zeros(1,numel(coh_tc));
+fig    = zeros(1,numel(coh_tc));
+
+co     = [1 0 0; 0 0 1; 0 0 0; 0 1 0 ; 1 1 0; 0 1 1;1 0 1];
+Lwidth = 1.5;
 for i = 1 : numel(coh_tc)
    
     fig(i) = figure;
-    plot(coh_tc{i}.pre_coh_v,'ro-')
+    set(fig(i),'defaultAxesColorOrder',co)
+    plot(coh_tc{i}.pre_coh_v,'o-','LineWidth',Lwidth)
     hold
     %plot(repmat(mean(coh_tc{i}.pre_coh_v),1,length(coh_tc{i}.pre_coh_v)),'r--')
-    plot(coh_tc{i}.post_coh_v,'bo-')
+    plot(coh_tc{i}.post_coh_v,'o-','LineWidth',Lwidth)
     %plot(repmat(mean(coh_tc{i}.post_coh_v),1,length(coh_tc{i}.post_coh_v)),'b--')
-    plot(coh_tc{i}.virt1_coh_v,'ko-')
+    plot(coh_tc{i}.virt1_coh_v,'o-','LineWidth',Lwidth)
     %plot(repmat(mean(coh_tc{i}.virt1_coh_v),1,length(coh_tc{i}.virt1_coh_v)),'k--')
-    plot(coh_tc{i}.virt2_coh_v,'go-')
+    plot(coh_tc{i}.virt2_coh_v,'o-','LineWidth',Lwidth)
     %plot(repmat(mean(coh_tc{i}.virt2_coh_v),1,length(coh_tc{i}.virt2_coh_v)),'g--')
     
     
@@ -64,7 +68,9 @@ for i = 1 : numel(coh_tc)
     ylabel('Synchronizability')
     xlabel('trial')
     %legend({'pre','pre-avg','post','post-avg','virtNoOrtho','virtNoOrtho-avg','virtual','virtual-avg'})
-    legend({'pre','post','virtNoOrtho','virtual'})
+    legend({'pre','post','VR_{Naive}','VR_{Ortho}'})
+    
+    set(fig(i),'defaultAxesColorOrder',co)
     
     title(subjNames{i})
 end
@@ -163,18 +169,20 @@ for i = 1 : numel(coh_tc)
         m_post(1:length(m_post)+1:end) = 0;
         
         g_fc(1,j) = get_Gfc(abs(m_pre));
-        g_fc(2,j) = get_Gfc(abs(m_v1));
-        g_fc(3,j) = get_Gfc(abs(m_v2));
-        g_fc(4,j) = get_Gfc(abs(m_post));
+        g_fc(2,j) = get_Gfc(abs(m_post));
+        g_fc(3,j) = get_Gfc(abs(m_v1));
+        g_fc(4,j) = get_Gfc(abs(m_v2));
+        
     end
     
-    
-    plot(g_fc','o-');
-    legend({'pre','vNaive','vOrto','post'});
+    set(fig(i),'defaultAxesColorOrder',co)
+    plot(g_fc','o-','LineWidth',Lwidth);
+    legend({'pre','post','VR_{Naive}','VR_{Ortho}',});
     title(subjNames{i})
     ylabel('Global Connectivity')
     xlabel('Trials')
     ylim([0 0.55])
+   
 end
 
 % save global functional connectivity

@@ -36,6 +36,11 @@ for i = 1: numel(subjName)
     
     cfg.notch           = [50 100 150];
     cfg.bpfreq          = [5   150];
+   
+    cfg.notchBool       = 'yes';
+    cfg.bpBool          = 'yes';
+    
+    
     out                 = coh_before_after(cfg);
     
     
@@ -131,7 +136,7 @@ for s = 1 : numel(situationName)
                 %cfgNotch.bsfreq   = [49 51];
                 %cfgNotch.trial    = 'all';
                 
-                cfgNotch.dftfilter = 'no';
+                cfgNotch.dftfilter = cfg.notchBool;
                 cfgNotch.dftfreq   = cfg.notch;
                 cfgNotch.trial    = 'all';
                 
@@ -142,7 +147,7 @@ for s = 1 : numel(situationName)
                 cfgPre.demean   = 'yes';
                 cfgPre.detrend  = 'yes';
                 cfgPre.trial    = 'all';
-                cfgPre.bpfilter = 'no';
+                cfgPre.bpfilter = cfg.bpBool;
                 cfgPre.bpfreq   = cfg.bpfreq;
 
                 m_data         = ft_preprocessing(cfgPre,m_data);
