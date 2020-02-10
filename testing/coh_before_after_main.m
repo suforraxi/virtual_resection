@@ -15,15 +15,8 @@ info_F = '/home/matteo/Desktop/virtual_resection/info/info.tsv';
 info_T = readtable(info_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
 info_T.Properties.RowNames = info_T.subjID;
 
-%subjName = {'RESP0320','RESP0384','RESP0451','RESP0619','RESP0634','RESP0168','RESP0288','RESP0591','RESP0659'};
 
-% subjName = {'RESP0067','RESP0118','RESP0124','RESP0149','RESP0168','RESP0231','RESP0288',...
-%             'RESP0301','RESP0362','RESP0381','RESP0384','RESP0396','RESP0409','RESP0424',...
-%             'RESP0428','RESP0451','RESP0465','RESP0586','RESP0591','RESP0619','RESP0634',...
-%             'RESP0659'
-%             };
-
-subjName = {'RESP0381', 'RESP0659'};
+subjName = {'RESP0381','RESP0384','RESP0428','RESP0451','RESP0465','RESP0586','RESP0659'};
 
         
 cfg.bidsFolder =  bidsFolder;
@@ -32,14 +25,25 @@ rTbl           = [];
 
 for i = 1: numel(subjName)
     
-    cfg.subjName = subjName{i};
-    cfg.seizOut  = info_T{subjName{i},'description_sf_1y'};
-    out          = coh_before_after(cfg);
+    cfg.subjName        = subjName{i};
+    cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
+    cfg.fc_type         = 'corr';
+    cfg.L               = 60;
+    cfg.overlap         = 0;
+    
+    cfg.Tlength         = 10; %seconds of new trials
+    cfg.Toverlap        = 0.5;
+    
+    cfg.notch           = [50 100 150];
+    cfg.bpfreq          = [5   150];
+    out                 = coh_before_after(cfg);
+    
     
     for s = 1 : numel(out)
         
         sit_res = out{s};
         
+        %save(fullfile(outFolder,'coh',strcat('sub-',subjName{i},'_','ses-',sit_res{1}.sitName,'_',sit_res{1}.fc_type)),'sit_res');
         save(fullfile(outFolder,'coh',strcat('sub-',subjName{i},'_','ses-',sit_res{1}.sitName)),'sit_res');
         
         %rTbl = [rTbl; create_table(sit_res) ];
@@ -52,7 +56,7 @@ end
 function out = coh_before_after(cfg)
 
 out = [];
-L   = 60; % time in second for the epoch
+L   = cfg.L; % time in second for the epoch
 
 % read data
 bidsFolder = cfg.bidsFolder; 
@@ -68,6 +72,7 @@ end
 
 [pre,inter,post] = find_pre_int_post(situationName);
 
+fc_type = cfg.fc_type;
 k = 1;
 for s = 1 : numel(situationName)
     
@@ -76,28 +81,36 @@ for s = 1 : numel(situationName)
         sitFolder =  fullfile(bidsFolder,strcat('sub-',subjName),strcat('ses-',situationName{s}),'ieeg',filesep);
         sitFName  =  strcat('sub-',subjName,'_','ses-',situationName{s},'_task-acute_ieeg') ;
 
-        [status,msg,cfg,data] = importBidsData(sitFolder);
+        [status,msg,cfgImport,data] = importBidsData(sitFolder);
 
         
         if(status == 0) 
             maxtime = max(cellfun(@length,data.time));
             if(  maxtime > L*data.fsample )
                 % use the last minute
-                cfg         = [];
-                cfg.trials  = 'all';
-                cfg.length  = L; %seconds of new trials
-                cfg.overlap = 0;
+                cfgRe         = [];
+                cfgRe.trials  = 'all';
+                cfgRe.length  = L; %seconds of new trials
+                cfgRe.overlap = cfg.overlap;
 
-                data = ft_redefinetrial(cfg,data);
+                data = ft_redefinetrial(cfgRe,data);
 
-                cfgLastEp        = [];
-                ntrials          = size(data.trial,2);
-                cfgLastEp.trials = ntrials;
-                data             = ft_selectdata(cfgLastEp,data); 
+                cfgLastEp         = [];
+                ntrials           = size(data.trial,2);
+                cfgLastEp.trials  = ntrials;
+                cfgLastEp.channel = {'Gr*'};
+                m_data            = ft_selectdata(cfgLastEp,data); 
 
                 % apply montage 
-
-                m_data = apply_bipolar2D_montage(data);
+                % avg
+                cfgM.reref       = 'yes';
+                cfgM.refmethod   = 'avg';
+                cfgM.implicitref = [];
+                cfgM.refchannel  = 'all';
+                m_data           = ft_preprocessing(cfgM,m_data);
+                
+                % bipolar two directions
+                %m_data = apply_bipolar2D_montage(m_data);
 
                 % remove artefacts
 
@@ -108,8 +121,8 @@ for s = 1 : numel(situationName)
                 
                 %% redefine trials
                  cfgReTrials.trials  = 'all';
-                 cfgReTrials.length  = 20; %seconds of new trials
-                 cfgReTrials.overlap = 0.5;
+                 cfgReTrials.length  = cfg.Tlength; %seconds of new trials
+                 cfgReTrials.overlap = cfg.Toverlap;
  
                  m_data = ft_redefinetrial(cfgReTrials,m_data);
                
@@ -118,8 +131,8 @@ for s = 1 : numel(situationName)
                 %cfgNotch.bsfreq   = [49 51];
                 %cfgNotch.trial    = 'all';
                 
-                cfgNotch.dftfilter = 'yes';
-                cfgNotch.dftfreq   = [50 100 150];
+                cfgNotch.dftfilter = 'no';
+                cfgNotch.dftfreq   = cfg.notch;
                 cfgNotch.trial    = 'all';
                 
                 m_data = ft_preprocessing(cfgNotch,m_data);
@@ -129,8 +142,8 @@ for s = 1 : numel(situationName)
                 cfgPre.demean   = 'yes';
                 cfgPre.detrend  = 'yes';
                 cfgPre.trial    = 'all';
-                cfgPre.bpfilter = 'yes';
-                cfgPre.bpfreq   = [5   150];
+                cfgPre.bpfilter = 'no';
+                cfgPre.bpfreq   = cfg.bpfreq;
 
                 m_data         = ft_preprocessing(cfgPre,m_data);
 
@@ -142,10 +155,12 @@ for s = 1 : numel(situationName)
                 %if(nTrial == 1 )      
 
                     mEnv            = get_Envelope(m_data.trial{t});
-                    C               = fc(mEnv);
+                    C               = fc(mEnv,fc_type);
                     m_data.trial{t} = mEnv;
                     [coh, V, E]     = get_coherence(C);
                     
+                    
+                    o{t}.fc_type  = fc_type;
                     o{t}.band     = cfgPre.bpfreq; 
                     o{t}.epoch    = cfgReTrials.length;
                     o{t}.overlap  = cfgReTrials.overlap;
@@ -157,26 +172,50 @@ for s = 1 : numel(situationName)
                     o{t}.subjName = subjName; 
                     o{t}.sitName  = situationName{s};
                     o{t}.so       = seizOut;
+                    
+                    
+                    
+                    
                 end
                 for t = 1 : nTrial % virtual resection
                     if(pre(s))
                         o{t}.sitType = 'Pre';
-                        % virtual resection
+                        
+                         % virtual resection
                         if(numel(res_channel) > 0) % there are resected channels
+                        
+                            % virtual resection without orthogonalization
+                            idx2rm = zeros(numel(m_data.label),1);
+                            for r = 1 :numel(res_channel)
+                                 mono_ch = res_channel{r};
+                                 idx2rm  = idx2rm | (~cellfun(@isempty,regexp(m_data.label,mono_ch)));
+
+                            end
+                            C           = o{t}.C;
+                            C1           = C(~idx2rm,~idx2rm);
+                            [coh, V, E] = get_coherence(C1);
+                            o{t}.V1coh  = coh;
+                            o{t}.C1     = C1;
+                            o{t}.V1     = V;
+                            o{t}.E1     = E;
+
+                        
+                       
                             
                             for r = 1 :numel(res_channel)
+                                 % virtual resection with orthogonalization
                                  mono_ch = res_channel{r};
                                  idx2rm  = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
                                 while(~isempty(idx2rm))
                                      m_data = remove_ch(m_data,idx2rm(1));
                                      idx2rm = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
                                 end
-                                C              = fc(m_data.trial{t});
-                                [coh, V, E]    = get_coherence(C);
-                                o{t}.Vcoh      = coh;
-                                o{t}.VC        = C;
-                                o{t}.VV        = V;
-                                o{t}.VE        = E;
+                                C2              = fc(m_data.trial{t},fc_type);
+                                [coh, V, E]     = get_coherence(C2);
+                                o{t}.V2coh      = coh;
+                                o{t}.C2         = C2;
+                                o{t}.V2         = V;
+                                o{t}.E2         = E;
                                 
                             end
                                             
@@ -184,10 +223,15 @@ for s = 1 : numel(situationName)
                     elseif(post(s))
                         o{t}.sitType = 'Post';
                        
-                        o{t}.Vcoh      = NaN;
-                        o{t}.VC        = NaN;
-                        o{t}.VV        = NaN;
-                        o{t}.VE        = NaN;
+                        o{t}.V1coh     = NaN;
+                        o{t}.C1        = NaN;
+                        o{t}.V1        = NaN;
+                        o{t}.E1        = NaN;
+                        
+                        o{t}.V2coh      = NaN;
+                        o{t}.C2         = NaN;
+                        o{t}.V2         = NaN;
+                        o{t}.E2         = NaN;
                     end
                 end
                 
