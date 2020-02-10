@@ -31,15 +31,19 @@ for i = 1: numel(subjName)
     cfg.L               = 60;
     cfg.overlap         = 0;
     
-    cfg.Tlength         = 10; %seconds of new trials
-    cfg.Toverlap        = 0.5;
+    cfg.Tlength         = 4; %seconds of new trials
+    cfg.Toverlap        = 0;
     
     cfg.notch           = [50 100 150];
     cfg.bpfreq          = [5   150];
    
-    cfg.notchBool       = 'yes';
-    cfg.bpBool          = 'yes';
+    cfg.notchBool       = 'no';
+    cfg.bpBool          = 'no';
     
+    
+    cfg.type            = 'huang_env';
+    cfg.nHComp          = 3;
+    cfg.selected_comp   = 2;
     
     out                 = coh_before_after(cfg);
     
@@ -112,10 +116,10 @@ for s = 1 : numel(situationName)
                 cfgM.refmethod   = 'avg';
                 cfgM.implicitref = [];
                 cfgM.refchannel  = 'all';
-                m_data           = ft_preprocessing(cfgM,m_data);
+                %m_data           = ft_preprocessing(cfgM,m_data);
                 
                 % bipolar two directions
-                %m_data = apply_bipolar2D_montage(m_data);
+                m_data = apply_bipolar2D_montage(m_data);
 
                 % remove artefacts
 
@@ -159,7 +163,7 @@ for s = 1 : numel(situationName)
                 for t = 1 : nTrial
                 %if(nTrial == 1 )      
 
-                    mEnv            = get_Envelope(m_data.trial{t});
+                    mEnv            = get_Envelope(cfg,m_data.trial{t});
                     C               = fc(mEnv,fc_type);
                     m_data.trial{t} = mEnv;
                     [coh, V, E]     = get_coherence(C);
