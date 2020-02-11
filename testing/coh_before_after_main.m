@@ -17,7 +17,7 @@ info_T.Properties.RowNames = info_T.subjID;
 
 
 subjName = {'RESP0381','RESP0384','RESP0428','RESP0451','RESP0465','RESP0586','RESP0659'};
-
+%subjName = {'RESP0381'};
         
 cfg.bidsFolder =  bidsFolder;
 out            = [];
@@ -27,23 +27,31 @@ for i = 1: numel(subjName)
     
     cfg.subjName        = subjName{i};
     cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
-    cfg.fc_type         = 'xcorr';
+    cfg.fc_type         = 'h2';
     cfg.L               = 60;
     cfg.overlap         = 0;
     
-    cfg.Tlength         = 5; %seconds of new trials
+    cfg.Tlength         = 2; %seconds of new trials
     cfg.Toverlap        = 0;
     
     cfg.notch           = [50 100 150];
     cfg.bpfreq          = [5   48];
+    %cfg.bpfreq          = [0   0];
    
     cfg.notchBool       = 'yes';
     cfg.bpBool          = 'yes';
     
     
     cfg.type            = 'filt_hilbert_env';
-    cfg.nHComp          = 2;
+    %cfg.type            = 'huang_env';
+    cfg.nHComp          = 3;
     cfg.selected_comp   = 2;
+    
+    
+    %cfg.NbestTrial      = 4;
+    %cfg.ScoreFreqRange  = 5:100;
+    %cfg.ScoreSmoothF    = 3;
+    
     
     out                 = coh_before_after(cfg);
     
@@ -109,17 +117,19 @@ for s = 1 : numel(situationName)
                 cfgLastEp.trials  = ntrials;
                 cfgLastEp.channel = {'Gr*'};
                 m_data            = ft_selectdata(cfgLastEp,data); 
-
+                
+                
+                
                 % apply montage 
                 % avg
                 cfgM.reref       = 'yes';
                 cfgM.refmethod   = 'avg';
                 cfgM.implicitref = [];
                 cfgM.refchannel  = 'all';
-                %m_data           = ft_preprocessing(cfgM,m_data);
+                m_data           = ft_preprocessing(cfgM,m_data);
                 
                 % bipolar two directions
-                m_data = apply_bipolar2D_montage(m_data);
+                %m_data = apply_bipolar2D_montage(m_data);
 
                 % remove artefacts
 
@@ -128,6 +138,14 @@ for s = 1 : numel(situationName)
                 cfgCH.channel                  = m_data.label(~idxChArtefact);
                 m_data                         = ft_preprocessing(cfgCH,m_data);  
                 
+                %% Select 'homogeneous trials'
+               % cfgScore.freqRange      = cfg.ScoreFreqRange;
+               % cfgScore.fs             = int32(m_data.fsample);
+               % cfgScore.windowL        = cfg.Tlength;
+               % cfgScore.smoothFactor   = cfg.ScoreSmoothF;
+                
+                %[idx_best_trial,~,scores] = scorEpochs(cfgScore,m_data.trial{1});
+                
                 %% redefine trials
                  cfgReTrials.trials  = 'all';
                  cfgReTrials.length  = cfg.Tlength; %seconds of new trials
@@ -135,10 +153,9 @@ for s = 1 : numel(situationName)
  
                  m_data = ft_redefinetrial(cfgReTrials,m_data);
                
+                 
+                 
                 %% remove power line (50Hz)
-                %cfgNotch.bsfilter = 'yes';
-                %cfgNotch.bsfreq   = [49 51];
-                %cfgNotch.trial    = 'all';
                 
                 cfgNotch.dftfilter = cfg.notchBool;
                 cfgNotch.dftfreq   = cfg.notch;
@@ -155,8 +172,12 @@ for s = 1 : numel(situationName)
                 cfgPre.bpfreq   = cfg.bpfreq;
 
                 m_data         = ft_preprocessing(cfgPre,m_data);
+                
 
-
+                %cfgSelT.trials  = idx_best_trial(1:cfg.NbestTrial);
+                %m_data          = ft_selectdata(cfgSelT,m_data);
+                
+                
                 % compute envelope and coherence
                 nTrial = numel(m_data.trial);
                 o      = []; % struct with the result for situation

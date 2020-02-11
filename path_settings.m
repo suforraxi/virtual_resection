@@ -40,6 +40,9 @@ addpath((fullfile(git_root,'fieldtrip','fieldtrip_private')));
 % json functions (https://github.com/fangq/jsonlab)
 addpath(fullfile(git_root,'jsonlab')) 
 
+% scorEpochs (https://github.com/suforraxi/scorepochs)
+addpath(fullfile(git_root,'scorepochs'))
+
 % virtual resection
 addpath(fullfile(git_root,'virtual_resection'))
 addpath(fullfile(git_root,'virtual_resection','import_trc'))

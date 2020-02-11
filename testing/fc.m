@@ -47,7 +47,18 @@ switch fc_type
         C = xcorr(x',1024,'normalized');
         C = max(abs(C))';
         C = reshape(C,size(x,1),size(x,1));
-         
+    
+    case 'h2' % linear and non-linear
+            
+        for i = 1 : nch
+            for j = 1 : nch
+               
+        
+                  C(i,j) = h2(x(i,:),x(j,:));
+            
+            end 
+        end
+        
 
 end
 
