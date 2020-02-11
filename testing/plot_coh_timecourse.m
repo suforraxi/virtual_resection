@@ -181,7 +181,7 @@ for i = 1 : numel(coh_tc)
     title(subjNames{i})
     ylabel('Global Connectivity')
     xlabel('Trials')
-    ylim([0 0.55])
+    ylim([0 1])
    
 end
 

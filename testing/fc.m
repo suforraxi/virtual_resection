@@ -41,6 +41,14 @@ switch fc_type
         C              = C + C';
         C(1:nch+1:end) = 1;
         %C              = diag(sum(C,2))-C;
+
+    case 'xcorr'
+        
+        C = xcorr(x',1024,'normalized');
+        C = max(abs(C))';
+        C = reshape(C,size(x,1),size(x,1));
+         
+
 end
 
 

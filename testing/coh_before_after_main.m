@@ -27,22 +27,22 @@ for i = 1: numel(subjName)
     
     cfg.subjName        = subjName{i};
     cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
-    cfg.fc_type         = 'corr';
+    cfg.fc_type         = 'xcorr';
     cfg.L               = 60;
     cfg.overlap         = 0;
     
-    cfg.Tlength         = 4; %seconds of new trials
+    cfg.Tlength         = 5; %seconds of new trials
     cfg.Toverlap        = 0;
     
     cfg.notch           = [50 100 150];
-    cfg.bpfreq          = [5   150];
+    cfg.bpfreq          = [5   48];
    
-    cfg.notchBool       = 'no';
-    cfg.bpBool          = 'no';
+    cfg.notchBool       = 'yes';
+    cfg.bpBool          = 'yes';
     
     
-    cfg.type            = 'huang_env';
-    cfg.nHComp          = 3;
+    cfg.type            = 'filt_hilbert_env';
+    cfg.nHComp          = 2;
     cfg.selected_comp   = 2;
     
     out                 = coh_before_after(cfg);
