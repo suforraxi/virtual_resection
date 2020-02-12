@@ -77,7 +77,10 @@ for i = 1 : numel(coh_tc)
     title(subjNames{i})
 end
 % save syncronizability
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/';
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/syn/';
+if(~exist(outFolder,'dir'))
+    mkdir(outFolder)
+end
 for i = 1 : numel(fig)
 
     set(fig(i),'WindowState','fullscreen')
@@ -91,7 +94,8 @@ fig    = zeros(1,numel(coh_tc));
 nr     = 4;
 nTrial = numel(coh_tc{1}.Cpre);
     
-
+fSizeMatrix = 12;
+ 
 
 for i = 1 : numel(coh_tc)
    
@@ -132,6 +136,7 @@ for i = 1 : numel(coh_tc)
         
         subplot(nr,nTrial,j)
         imagesc(abs(m_pre),[c_min,c_max]);
+        title(sprintf('Trial %i',j))
         subplot(nr,nTrial,j+nTrial)
         imagesc(abs(m_v1),[c_min,c_max]);
         subplot(nr,nTrial,j+2*nTrial)
@@ -141,13 +146,28 @@ for i = 1 : numel(coh_tc)
         
         
     end
-    title(subjNames{i})
+    
+    subplot(nr,nTrial,1)
+    ylabel(sprintf('%s Pre',subjNames{i}),'FontSize',fSizeMatrix)
+    subplot(nr,nTrial,nTrial+1)
+    ylabel('VR_{naive}','FontSize',fSizeMatrix)
+    subplot(nr,nTrial,2*nTrial+1)
+    ylabel('Vr_{ortho}','FontSize',fSizeMatrix)
+    subplot(nr,nTrial,3*nTrial+1)
+    ylabel('Post','FontSize',fSizeMatrix)
+    
+   
+    colorbar('manual','Position',[0.94 0.1 0.02 0.2])
+   
     
 end
 
 
 % save  functional connectivity matrices
-
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/matrix/';
+if(~exist(outFolder,'dir'))
+    mkdir(outFolder)
+end
 for i = 1 : numel(fig)
 
     set(fig(i),'WindowState','fullscreen')
@@ -156,9 +176,8 @@ for i = 1 : numel(fig)
     close(fig(i))
 end
 
-%global connectivity
+% global connectivity
 
-%plot functional connectivity matrix
 fig     = zeros(1,numel(coh_tc));
 nTrial  = numel(coh_tc{1}.Cpre);
 get_Gfc = @(x) sum(sum(x))/(size(x,1)^2-size(x,1));    
@@ -200,7 +219,10 @@ for i = 1 : numel(coh_tc)
 end
 
 % save global functional connectivity
-
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/global/';
+if(~exist(outFolder,'dir'))
+    mkdir(outFolder)
+end
 for i = 1 : numel(fig)
 
     set(fig(i),'WindowState','fullscreen')
