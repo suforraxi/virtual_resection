@@ -27,15 +27,15 @@ for i = 1: numel(subjName)
     
     cfg.subjName        = subjName{i};
     cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
-    cfg.fc_type         = 'h2';
+    cfg.fc_type         = 'corr';
     cfg.L               = 60;
     cfg.overlap         = 0;
     
-    cfg.Tlength         = 2; %seconds of new trials
+    cfg.Tlength         = 5; %seconds of new trials
     cfg.Toverlap        = 0;
     
     cfg.notch           = [50 100 150];
-    cfg.bpfreq          = [5   48];
+    cfg.bpfreq          = [5   150];
     %cfg.bpfreq          = [0   0];
    
     cfg.notchBool       = 'yes';

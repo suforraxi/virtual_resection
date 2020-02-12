@@ -87,66 +87,78 @@ for i = 1 : numel(fig)
 end
 
 % plot functinal connectivity matrix
-% fig    = zeros(1,numel(coh_tc));
-% nr     = 4;
-% nTrial = numel(coh_tc{1}.Cpre);
-%     
-% 
-% 
-% for i = 1 : numel(coh_tc)
-%    
-%     fig(i) = figure;
-%     max_t = zeros(1,nTrial);
-%     min_t = zeros(1,nTrial);
-%     
-%     for j = 1 : nTrial
-%         
-%         m_pre  = coh_tc{i}.Cpre{j};
-%         m_v1   = coh_tc{i}.C1{j};
-%         m_v2   = coh_tc{i}.C2{j};
-%         m_post = coh_tc{i}.Cpost{j};
-%         
-%         m_pre(1:length(m_pre)+1:end)   = 0;
-%         m_v1(1:length(m_v1)+1:end)     = 0;
-%         m_v2(1:length(m_v2)+1:end)     = 0;
-%         m_post(1:length(m_post)+1:end) = 0;
-%         
-%         max_t(j) = max([max(m_pre(:)),max(m_v1(:)),max(m_v2(:)),max(m_post(:))]);
-%         min_t(j) = min([min(m_pre(:)),min(m_v1(:)),min(m_v2(:)),min(m_post(:))]);
-%     end
-%     
-%     c_max = max(max_t); 
-%     c_min = min(min_t);
-%     
-%     for j = 1 : nTrial
-%         
-%         m_pre  = coh_tc{i}.Cpre{j};
-%         m_v1   = coh_tc{i}.C1{j};
-%         m_v2   = coh_tc{i}.C2{j};
-%         m_post = coh_tc{i}.Cpost{j};
-%         
-%         m_pre(1:length(m_pre)+1:end)   = 0;
-%         m_v1(1:length(m_v1)+1:end)     = 0;
-%         m_v2(1:length(m_v2)+1:end)     = 0;
-%         m_post(1:length(m_post)+1:end) = 0;
-%         
-%         subplot(nr,nTrial,j)
-%         imagesc(m_pre,[c_min,c_max]);
-%         subplot(nr,nTrial,j+nTrial)
-%         imagesc(m_v1,[c_min,c_max]);
-%         subplot(nr,nTrial,j+2*nTrial)
-%         imagesc(m_v2),[c_min,c_max];
-%         subplot(nr,nTrial,j+3*nTrial)
-%         imagesc(m_post,[c_min,c_max]);
-%         
-%         
-%     end
-%     
-% end
+fig    = zeros(1,numel(coh_tc));
+nr     = 4;
+nTrial = numel(coh_tc{1}.Cpre);
+    
 
-% global connectivity
 
-% plot functional connectivity matrix
+for i = 1 : numel(coh_tc)
+   
+    fig(i) = figure;
+    max_t = zeros(1,nTrial);
+    min_t = zeros(1,nTrial);
+    
+    for j = 1 : nTrial
+        
+        m_pre  = coh_tc{i}.Cpre{j};
+        m_v1   = coh_tc{i}.C1{j};
+        m_v2   = coh_tc{i}.C2{j};
+        m_post = coh_tc{i}.Cpost{j};
+        
+        m_pre(1:length(m_pre)+1:end)   = 0;
+        m_v1(1:length(m_v1)+1:end)     = 0;
+        m_v2(1:length(m_v2)+1:end)     = 0;
+        m_post(1:length(m_post)+1:end) = 0;
+        
+        max_t(j) = max([max(abs(m_pre(:))),max(abs(m_v1(:))),max(abs(m_v2(:))),max(abs(m_post(:)))]);
+        min_t(j) = min([min(abs(m_pre(:))),min(abs(m_v1(:))),min(abs(m_v2(:))),min(abs(m_post(:)))]);
+    end
+    
+    c_max = max(max_t); 
+    c_min = min(min_t);
+    
+    for j = 1 : nTrial
+        
+        m_pre  = coh_tc{i}.Cpre{j};
+        m_v1   = coh_tc{i}.C1{j};
+        m_v2   = coh_tc{i}.C2{j};
+        m_post = coh_tc{i}.Cpost{j};
+        
+        m_pre(1:length(m_pre)+1:end)   = 0;
+        m_v1(1:length(m_v1)+1:end)     = 0;
+        m_v2(1:length(m_v2)+1:end)     = 0;
+        m_post(1:length(m_post)+1:end) = 0;
+        
+        subplot(nr,nTrial,j)
+        imagesc(abs(m_pre),[c_min,c_max]);
+        subplot(nr,nTrial,j+nTrial)
+        imagesc(abs(m_v1),[c_min,c_max]);
+        subplot(nr,nTrial,j+2*nTrial)
+        imagesc(abs(m_v2)),[c_min,c_max];
+        subplot(nr,nTrial,j+3*nTrial)
+        imagesc(abs(m_post),[c_min,c_max]);
+        
+        
+    end
+    title(subjNames{i})
+    
+end
+
+
+% save  functional connectivity matrices
+
+for i = 1 : numel(fig)
+
+    set(fig(i),'WindowState','fullscreen')
+    outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','matrix'));
+    print(fig(i),outfile,'-djpeg');
+    close(fig(i))
+end
+
+%global connectivity
+
+%plot functional connectivity matrix
 fig     = zeros(1,numel(coh_tc));
 nTrial  = numel(coh_tc{1}.Cpre);
 get_Gfc = @(x) sum(sum(x))/(size(x,1)^2-size(x,1));    
