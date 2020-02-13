@@ -50,3 +50,7 @@ addpath(fullfile(git_root,'virtual_resection','montage'))
 addpath(fullfile(git_root,'virtual_resection','testing'))
 addpath(fullfile(git_root,'virtual_resection','external'))
 
+% notBoxplot https://github.com/raacampbell/notBoxPlot
+addpath(fullfile(git_root,'notBoxPlot','code'))
+
+
