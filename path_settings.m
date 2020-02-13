@@ -48,3 +48,5 @@ addpath(fullfile(git_root,'virtual_resection'))
 addpath(fullfile(git_root,'virtual_resection','import_trc'))
 addpath(fullfile(git_root,'virtual_resection','montage'))
 addpath(fullfile(git_root,'virtual_resection','testing'))
+addpath(fullfile(git_root,'virtual_resection','external'))
+

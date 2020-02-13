@@ -54,7 +54,7 @@ switch fc_type
             for j = 1 : nch
                
         
-                  C(i,j) = h2(x(i,:),x(j,:));
+                  C(i,j) = h2_m(x(i,:),x(j,:));
             
             end 
         end

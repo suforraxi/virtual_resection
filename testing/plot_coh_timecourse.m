@@ -22,18 +22,18 @@ for s = 1: numel(subjNames)
         switch sit_res{1}.sitType
            
             case 'Pre'
-                  coh_tc{s}.pre_coh_v   = cellfun(@getfield,sit_res,repmat({'coh'},1,numel(sit_res)));
+                  %coh_tc{s}.pre_coh_v   = cellfun(@getfield,sit_res,repmat({'coh'},1,numel(sit_res)));
                   coh_tc{s}.Cpre        = cellfun(@getfield,sit_res,repmat({'C'},1,numel(sit_res)),'UniformOutput',false);
                    
-                  coh_tc{s}.virt1_coh_v = cellfun(@getfield,sit_res,repmat({'V1coh'},1,numel(sit_res)));
+                  %coh_tc{s}.virt1_coh_v = cellfun(@getfield,sit_res,repmat({'V1coh'},1,numel(sit_res)));
                   coh_tc{s}.C1           = cellfun(@getfield,sit_res,repmat({'C1'},1,numel(sit_res)),'UniformOutput',false);
                   
-                  coh_tc{s}.virt2_coh_v = cellfun(@getfield,sit_res,repmat({'V2coh'},1,numel(sit_res)));
+                  %coh_tc{s}.virt2_coh_v = cellfun(@getfield,sit_res,repmat({'V2coh'},1,numel(sit_res)));
                   coh_tc{s}.C2          = cellfun(@getfield,sit_res,repmat({'C2'},1,numel(sit_res)),'UniformOutput',false);
                     
                
             case 'Post'
-                  coh_tc{s}.post_coh_v  = cellfun(@getfield,sit_res,repmat({'coh'},1,numel(sit_res)));
+                  %coh_tc{s}.post_coh_v  = cellfun(@getfield,sit_res,repmat({'coh'},1,numel(sit_res)));
                   coh_tc{s}.Cpost       = cellfun(@getfield,sit_res,repmat({'C'},1,numel(sit_res)),'UniformOutput',false);
         end
         
@@ -51,43 +51,43 @@ fig    = zeros(1,numel(coh_tc));
 
 co     = [1 0 0; 0 0 1; 0 0 0; 0 1 0 ; 1 1 0; 0 1 1;1 0 1];
 Lwidth = 1.5;
-for i = 1 : numel(coh_tc)
-   
-    fig(i) = figure;
-    set(fig(i),'defaultAxesColorOrder',co)
-    plot(coh_tc{i}.pre_coh_v,'o-','LineWidth',Lwidth)
-    hold
-    %plot(repmat(mean(coh_tc{i}.pre_coh_v),1,length(coh_tc{i}.pre_coh_v)),'r--')
-    plot(coh_tc{i}.post_coh_v,'o-','LineWidth',Lwidth)
-    %plot(repmat(mean(coh_tc{i}.post_coh_v),1,length(coh_tc{i}.post_coh_v)),'b--')
-    plot(coh_tc{i}.virt1_coh_v,'o-','LineWidth',Lwidth)
-    %plot(repmat(mean(coh_tc{i}.virt1_coh_v),1,length(coh_tc{i}.virt1_coh_v)),'k--')
-    plot(coh_tc{i}.virt2_coh_v,'o-','LineWidth',Lwidth)
-    %plot(repmat(mean(coh_tc{i}.virt2_coh_v),1,length(coh_tc{i}.virt2_coh_v)),'g--')
-    
-    
-    ylim([0 1])
-    ylabel('Synchronizability')
-    xlabel('trial')
-    %legend({'pre','pre-avg','post','post-avg','virtNoOrtho','virtNoOrtho-avg','virtual','virtual-avg'})
-    legend({'pre','post','VR_{Naive}','VR_{Ortho}'})
-    
-    set(fig(i),'defaultAxesColorOrder',co)
-    
-    title(subjNames{i})
-end
-% save syncronizability
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/syn/';
-if(~exist(outFolder,'dir'))
-    mkdir(outFolder)
-end
-for i = 1 : numel(fig)
-
-    set(fig(i),'WindowState','fullscreen')
-    outfile = fullfile(outFolder,coh_tc{i}.fname);
-    print(fig(i),outfile,'-djpeg');
-    close(fig(i))
-end
+% for i = 1 : numel(coh_tc)
+%    
+%     fig(i) = figure;
+%     set(fig(i),'defaultAxesColorOrder',co)
+%     plot(coh_tc{i}.pre_coh_v,'o-','LineWidth',Lwidth)
+%     hold
+%     %plot(repmat(mean(coh_tc{i}.pre_coh_v),1,length(coh_tc{i}.pre_coh_v)),'r--')
+%     plot(coh_tc{i}.post_coh_v,'o-','LineWidth',Lwidth)
+%     %plot(repmat(mean(coh_tc{i}.post_coh_v),1,length(coh_tc{i}.post_coh_v)),'b--')
+%     plot(coh_tc{i}.virt1_coh_v,'o-','LineWidth',Lwidth)
+%     %plot(repmat(mean(coh_tc{i}.virt1_coh_v),1,length(coh_tc{i}.virt1_coh_v)),'k--')
+%     plot(coh_tc{i}.virt2_coh_v,'o-','LineWidth',Lwidth)
+%     %plot(repmat(mean(coh_tc{i}.virt2_coh_v),1,length(coh_tc{i}.virt2_coh_v)),'g--')
+%     
+%     
+%     ylim([0 1])
+%     ylabel('Synchronizability')
+%     xlabel('trial')
+%     %legend({'pre','pre-avg','post','post-avg','virtNoOrtho','virtNoOrtho-avg','virtual','virtual-avg'})
+%     legend({'pre','post','VR_{Naive}','VR_{Ortho}'})
+%     
+%     set(fig(i),'defaultAxesColorOrder',co)
+%     
+%     title(subjNames{i})
+% end
+% % save syncronizability
+% outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/syn/';
+% if(~exist(outFolder,'dir'))
+%     mkdir(outFolder)
+% end
+% for i = 1 : numel(fig)
+% 
+%     set(fig(i),'WindowState','fullscreen')
+%     outfile = fullfile(outFolder,coh_tc{i}.fname);
+%     print(fig(i),outfile,'-djpeg');
+%     close(fig(i))
+% end
 
 % plot functinal connectivity matrix
 fig    = zeros(1,numel(coh_tc));
@@ -140,7 +140,7 @@ for i = 1 : numel(coh_tc)
         subplot(nr,nTrial,j+nTrial)
         imagesc(abs(m_v1),[c_min,c_max]);
         subplot(nr,nTrial,j+2*nTrial)
-        imagesc(abs(m_v2)),[c_min,c_max];
+        imagesc(abs(m_v2),[c_min,c_max]);
         subplot(nr,nTrial,j+3*nTrial)
         imagesc(abs(m_post),[c_min,c_max]);
         
