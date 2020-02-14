@@ -2,14 +2,16 @@ function orth_example()
 clear all
 close all
 
-x = 4 ;
+x = 4 + 1i;
 y = 1 + 2*1i;
 
 %x = x/abs(x);
 %y = y/abs(y);
 
-compass(real(x),imag(x));
+compass(real(x),imag(x),'b');
 hold
+compass(real(x),imag(x'),'b--');
+
 compass(real(y),imag(y),'r');
 
 x_coord = [real(x) imag(x)];

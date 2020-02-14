@@ -1,3 +1,4 @@
+function plot_coh_timecourse()
 
 inFolder = '/home/matteo/Desktop/virtual_resection/coh/';
 
@@ -180,42 +181,47 @@ end
 
 fig     = zeros(1,numel(coh_tc));
 nTrial  = numel(coh_tc{1}.Cpre);
-get_Gfc = @(x) sum(sum(x))/(size(x,1)^2-size(x,1));    
+
+
 nr      = 4;
 for i = 1 : numel(coh_tc)
    
     fig(i) = figure;
-    max_t = zeros(1,nTrial);
-    min_t = zeros(1,nTrial);
+    subplot(1,2,1)
+    %max_t = zeros(1,nTrial);
+    %min_t = zeros(1,nTrial);
     
-    g_fc  = zeros(nr,nTrial);
+    avg_fc  = zeros(nr,nTrial);
+  
+    
     for j = 1 : nTrial
         
         m_pre  = coh_tc{i}.Cpre{j};
         m_v1   = coh_tc{i}.C1{j};
         m_v2   = coh_tc{i}.C2{j};
         m_post = coh_tc{i}.Cpost{j};
-        
-        m_pre(1:length(m_pre)+1:end)   = 0;
-        m_v1(1:length(m_v1)+1:end)     = 0;
-        m_v2(1:length(m_v2)+1:end)     = 0;
-        m_post(1:length(m_post)+1:end) = 0;
-        
-        g_fc(1,j) = get_Gfc(abs(m_pre));
-        g_fc(2,j) = get_Gfc(abs(m_post));
-        g_fc(3,j) = get_Gfc(abs(m_v1));
-        g_fc(4,j) = get_Gfc(abs(m_v2));
+       
+        avg_fc(1,j) = get_Stats(m_pre);
+        avg_fc(2,j) = get_Stats(m_post);
+        avg_fc(3,j) = get_Stats(m_v1);
+        avg_fc(4,j) = get_Stats(m_v2);
         
     end
     
     set(fig(i),'defaultAxesColorOrder',co)
-    plot(g_fc','o-','LineWidth',Lwidth);
-    legend({'pre','post','VR_{Naive}','VR_{Ortho}',});
+    plot(avg_fc','o-','LineWidth',Lwidth);
+    legend({'pre','post','VR_{Naive}','VR_{Ortho}'});
     title(subjNames{i})
     ylabel('Global Connectivity')
     xlabel('Trials')
     ylim([0 1])
-   
+  
+    subplot(1,2,2)
+    notBoxPlot(avg_fc')
+    xticklabels({'pre','post','VR_{Naive}','VR_{Ortho}'});
+    ylabel('Global Connectivity')
+    ylim([0 0.4])
+    
 end
 
 % save global functional connectivity
@@ -231,3 +237,24 @@ for i = 1 : numel(fig)
     close(fig(i))
 end
 
+
+function [avg_fc]= get_Stats(m)
+
+        % compute average global connectivity
+        get_Gfc = @(x) sum(sum(x))/(size(x,1)^2-size(x,1));
+        
+        % put zeros on the diagonal
+        m(1:length(m)+1:end)   = 0;
+        
+        avg_fc = get_Gfc(abs(m)); % FIX abs value if it is correlation 
+        
+        %mask = true(size(m));
+        
+        %mask(1:length(m)+1:end) = false;
+        
+        %var_fc = std(m(mask));
+       
+        
+        
+        
+        

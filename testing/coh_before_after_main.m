@@ -35,17 +35,19 @@ for i = 1: numel(subjName)
     cfg.Toverlap        = 0;
     
     cfg.notch           = [50 100 150];
-    cfg.bpfreq          = [5   150];
+    cfg.bpfreq          = [2  48];
     %cfg.bpfreq          = [0   0];
    
     cfg.notchBool       = 'yes';
     cfg.bpBool          = 'yes';
-    
+      
+    %cfg.notchBool       = 'no';
+    %cfg.bpBool          = 'no';
     
     cfg.type            = 'filt_hilbert_env';
     %cfg.type            = 'huang_env';
-    cfg.nHComp          = 3;
-    cfg.selected_comp   = 2;
+    %cfg.nHComp          = 3;
+    %cfg.selected_comp   = 2;
     
     
     %cfg.NbestTrial      = 4;
