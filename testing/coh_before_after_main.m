@@ -17,7 +17,7 @@ info_T.Properties.RowNames = info_T.subjID;
 
 
 subjName = {'RESP0381','RESP0384','RESP0428','RESP0451','RESP0465','RESP0586','RESP0659'};
-%subjName = {'RESP0451'};
+%subjName = {'RESP0381'};
         
 cfg.bidsFolder =  bidsFolder;
 out            = [];
@@ -35,7 +35,7 @@ for i = 1: numel(subjName)
     cfg.Toverlap        = 0;
     
     cfg.notch           = [50 100 150];
-    cfg.bpfreq          = [2  48];
+    cfg.bpfreq          = [5  150];
     %cfg.bpfreq          = [0   0];
    
     cfg.notchBool       = 'yes';
@@ -312,6 +312,20 @@ for s = 1 : numel(situationName)
         sitFolder =  fullfile(bidsFolder,strcat('sub-',subjName),strcat('ses-',situationName{s}),'ieeg',filesep);
         sitFName  =  strcat('sub-',subjName,'_','ses-',situationName{s},'_task-acute_ieeg') ;
 
+        
+        cfgAnalysis.sitFName = sitFName;
+        cfgAnalysis.subjName = subjName;
+        cfgAnalysis.sitName  = situationName{s};
+        cfgAnalysis.bpfreq   = cfg.bpfreq;
+        cfgAnalysis.epoch    = cfg.Tlength;
+        cfgAnalysis.overlap  = cfg.Toverlap;
+        cfgAnalysis.seizOut  = cfg.seizOut;
+        cfgAnalysis.fc_type  = fc_type;
+        cfgAnalysis.type     = cfg.type;
+        cfgAnalysis.pre      = pre(s);
+        cfgAnalysis.post     = post(s);
+        
+        
         [status,msg,cfgImport,data] = importBidsData(sitFolder);
 
         
@@ -351,6 +365,8 @@ for s = 1 : numel(situationName)
                 [idxChArtefact ,idx_art_trial] = find_artefacts(m_data.sampleinfo,m_data.label,artefact_T);
                 cfgCH.channel                  = m_data.label(~idxChArtefact);
                 m_data                         = ft_preprocessing(cfgCH,m_data);  
+                
+                
                 
                 %% Select 'homogeneous trials'
                % cfgScore.freqRange      = cfg.ScoreFreqRange;
@@ -393,95 +409,97 @@ for s = 1 : numel(situationName)
                 
                 
                 % compute envelope and coherence
-                nTrial = numel(m_data.trial);
-                o      = []; % struct with the result for situation
-                for t = 1 : nTrial
-                %if(nTrial == 1 )      
-
-                    mEnv            = get_Envelope(cfg,m_data.trial{t});
-                    C               = fc(mEnv,fc_type);
-                    m_data.trial{t} = mEnv;
-                    %[coh, V, E]     = get_coherence(C);
-                    
-                    
-                    o{t}.fc_type  = fc_type;
-                    o{t}.band     = cfgPre.bpfreq; 
-                    o{t}.epoch    = cfgReTrials.length;
-                    o{t}.overlap  = cfgReTrials.overlap;
-                    %o{t}.coh      = coh;
-                    o{t}.C        = C;
-                    %o{t}.V        = V;
-                    %o{t}.E        = E;
-                    o{t}.sitFName = sitFName;
-                    o{t}.subjName = subjName; 
-                    o{t}.sitName  = situationName{s};
-                    o{t}.so       = seizOut;
-                    
-                    
-                    
-                    
-                end
-                for t = 1 : nTrial % virtual resection
-                    if(pre(s))
-                        o{t}.sitType = 'Pre';
-                        
-                         % virtual resection
-                        if(numel(res_channel) > 0) % there are resected channels
-                        
-                            % virtual resection without orthogonalization
-                            idx2rm = zeros(numel(m_data.label),1);
-                            for r = 1 :numel(res_channel)
-                                 mono_ch = res_channel{r};
-                                 idx2rm  = idx2rm | (~cellfun(@isempty,regexp(m_data.label,mono_ch)));
-
-                            end
-                            C           = o{t}.C;
-                            C1           = C(~idx2rm,~idx2rm);
-                            %[coh, V, E] = get_coherence(C1);
-                            %o{t}.V1coh  = coh;
-                            o{t}.C1     = C1;
-                            %o{t}.V1     = V;
-                            %o{t}.E1     = E;
-
-                        
-                       
-                            
-                            for r = 1 :numel(res_channel)
-                                 % virtual resection with orthogonalization
-                                 mono_ch = res_channel{r};
-                                 idx2rm  = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
-                                %while(~isempty(idx2rm))
-                                %      m_data = remove_ch(m_data,idx2rm(1));
-                                %      idx2rm = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
-                                %end
-                                m_data          = removeNoNLinear_ch(m_data,idx2rm);
-                                C2              = fc(m_data.trial{t},fc_type);
-                                %[coh, V, E]     = get_coherence(C2);
-                                %o{t}.V2coh      = coh;
-                                o{t}.C2         = C2;
-                                %o{t}.V2         = V;
-                                %o{t}.E2         = E;
-                                
-                            end
-                                            
-                        end 
-                    elseif(post(s))
-                        o{t}.sitType = 'Post';
-                       
-                        %o{t}.V1coh     = NaN;
-                        o{t}.C1        = NaN;
-                        %o{t}.V1        = NaN;
-                        %o{t}.E1        = NaN;
-                        
-                        %o{t}.V2coh      = NaN;
-                        o{t}.C2         = NaN;
-                        %o{t}.V2         = NaN;
-                        %o{t}.E2         = NaN;
-                    end
-                end
+%                nTrial = numel(m_data.trial);
+%                o      = []; % struct with the result for situation
+%                 for t = 1 : nTrial
+%                 %if(nTrial == 1 )      
+% 
+%                     mEnv            = get_Envelope(cfg,m_data.trial{t});
+%                     C               = fc(mEnv,fc_type);
+%                     m_data.trial{t} = mEnv;
+%                     %[coh, V, E]     = get_coherence(C);
+%                     
+%                     
+%                     o{t}.fc_type  = fc_type;
+%                     o{t}.band     = cfgPre.bpfreq; 
+%                     o{t}.epoch    = cfgReTrials.length;
+%                     o{t}.overlap  = cfgReTrials.overlap;
+%                     %o{t}.coh      = coh;
+%                     o{t}.C        = C;
+%                     %o{t}.V        = V;
+%                     %o{t}.E        = E;
+%                     o{t}.sitFName = sitFName;
+%                     o{t}.subjName = subjName; 
+%                     o{t}.sitName  = situationName{s};
+%                     o{t}.so       = seizOut;
+%                     
+%                     
+%                     
+%                     
+%                 end
+%                 for t = 1 : nTrial % virtual resection
+%                     if(pre(s))
+%                         o{t}.sitType = 'Pre';
+%                         
+%                          % virtual resection
+%                         if(numel(res_channel) > 0) % there are resected channels
+%                         
+%                             % virtual resection without orthogonalization
+%                             idx2rm = zeros(numel(m_data.label),1);
+%                             for r = 1 :numel(res_channel)
+%                                  mono_ch = res_channel{r};
+%                                  idx2rm  = idx2rm | (~cellfun(@isempty,regexp(m_data.label,mono_ch)));
+% 
+%                             end
+%                             C           = o{t}.C;
+%                             C1           = C(~idx2rm,~idx2rm);
+%                             %[coh, V, E] = get_coherence(C1);
+%                             %o{t}.V1coh  = coh;
+%                             o{t}.C1     = C1;
+%                             %o{t}.V1     = V;
+%                             %o{t}.E1     = E;
+% 
+%                         
+%                        
+%                             
+%                             for r = 1 :numel(res_channel)
+%                                  % virtual resection with orthogonalization
+%                                  mono_ch = res_channel{r};
+%                                  idx2rm  = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
+%                                 %while(~isempty(idx2rm))
+%                                 %      m_data = remove_ch(m_data,idx2rm(1));
+%                                 %      idx2rm = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
+%                                 %end
+%                                 m_data          = removeNoNLinear_ch(m_data,idx2rm);
+%                                 C2              = fc(m_data.trial{t},fc_type);
+%                                 %[coh, V, E]     = get_coherence(C2);
+%                                 %o{t}.V2coh      = coh;
+%                                 o{t}.C2         = C2;
+%                                 %o{t}.V2         = V;
+%                                 %o{t}.E2         = E;
+%                                 
+%                             end
+%                                             
+%                         end 
+%                     elseif(post(s))
+%                         o{t}.sitType = 'Post';
+%                        
+%                         %o{t}.V1coh     = NaN;
+%                         o{t}.C1        = NaN;
+%                         %o{t}.V1        = NaN;
+%                         %o{t}.E1        = NaN;
+%                         
+%                         %o{t}.V2coh      = NaN;
+%                         o{t}.C2         = NaN;
+%                         %o{t}.V2         = NaN;
+%                         %o{t}.E2         = NaN;
+%                     end
+%                 end
+%                 
+%               
+                cfgAnalysis.res_ch = res_channel;
                 
-                
-                
+                o      = compute_fc_pre_post_virt(cfgAnalysis,m_data);
                 out{k} = o;  
                 k      = k + 1;
         end % max time
@@ -490,6 +508,90 @@ end % pre or post
     
     
 end
+
+
+% Compute three things:
+% 
+% 1) Functional connectivity pre-resection and post-resection.
+%
+% 2) Simulate the resection from pre-resection recordings 
+%    (virtual resection naive) as in the paper of Kini 2019 
+%    (naive removing the channels without removing 'the effect')
+%
+% 3) Simulate the resection from pre-resection recordings
+%    (virtual resection with signal partialization) 
+%
+%
+
+function o = compute_fc_pre_post_virt(cfg,m_data)
+
+
+
+nTrial      = numel(m_data.trial);
+res_channel = cfg.res_ch;
+fc_type     = cfg.fc_type;
+pre         = cfg.pre;
+post        = cfg.post;
+
+o      = []; % struct with the result for situation
+
+
+for t = 1 : nTrial     
+
+    mEnv            = get_Envelope(cfg,m_data.trial{t});
+    C               = fc(mEnv,fc_type);
+    m_data.trial{t} = mEnv;
+ 
+    o{t}.fc_type  = fc_type;
+    o{t}.band     = cfg.bpfreq; 
+    o{t}.epoch    = cfg.epoch;
+    o{t}.overlap  = cfg.overlap;
+  
+    o{t}.C        = C;
+  
+    o{t}.sitFName = cfg.sitFName;
+    o{t}.subjName = cfg.subjName;
+    o{t}.sitName  = cfg.sitName;
+    o{t}.so       = cfg.seizOut;
+
+end
+for t = 1 : nTrial % virtual resection
+    if(pre)
+        o{t}.sitType = 'Pre';
+
+         % virtual resection
+        if(numel(res_channel) > 0) % there are resected channels
+
+            % virtual resection naive
+            idx2rm = zeros(numel(m_data.label),1);
+            % find indexes to be resected
+            for r = 1 :numel(res_channel)
+                 mono_ch = res_channel{r};
+                 idx2rm  = idx2rm | (~cellfun(@isempty,regexp(m_data.label,mono_ch)));
+            end
+            C           = o{t}.C;
+            C1           = C(~idx2rm,~idx2rm);
+            o{t}.C1     = C1;
+        
+            % virtual resection with partialization
+            m_data   = removeNoNLinear_ch(m_data,idx2rm); 
+            C2       = fc(m_data.trial{t},fc_type);
+            o{t}.C2  = C2;
+            
+        else % no need to remove channels (it should not happen given the data)
+            o{t}.C1     = C;
+            o{t}.C2     = C;
+        end
+    elseif(post)
+        o{t}.sitType = 'Post';
+        o{t}.C1      = NaN;
+        o{t}.C2      = NaN;
+       
+    end
+end
+
+
+
 
 
 
