@@ -17,7 +17,7 @@ info_T.Properties.RowNames = info_T.subjID;
 
 
 subjName = {'RESP0381','RESP0384','RESP0428','RESP0451','RESP0465','RESP0586','RESP0659'};
-%subjName = {'RESP0381'};
+%subjName = {'RESP0384'};
         
 cfg.bidsFolder =  bidsFolder;
 out            = [];
@@ -189,7 +189,7 @@ for s = 1 : numel(situationName)
 
                     mEnv            = get_Envelope(cfg,m_data.trial{t});
                     C               = fc(mEnv,fc_type);
-                    m_data.trial{t} = mEnv;
+                    %m_data.trial{t} = mEnv;
                     [coh, V, E]     = get_coherence(C);
                     
                     
@@ -243,8 +243,8 @@ for s = 1 : numel(situationName)
                                       m_data = remove_ch(m_data,idx2rm(1));
                                       idx2rm = find(~cellfun(@isempty,regexp(m_data.label,mono_ch)));
                                 end
-                                
-                                C2              = fc(m_data.trial{t},fc_type);
+                                mEnv            = get_Envelope(cfg,m_data.trial{t});
+                                C2              = fc(mEnv,fc_type);
                                 [coh, V, E]     = get_coherence(C2);
                                 o{t}.V2coh      = coh;
                                 o{t}.C2         = C2;
@@ -540,7 +540,7 @@ for t = 1 : nTrial
 
     mEnv            = get_Envelope(cfg,m_data.trial{t});
     C               = fc(mEnv,fc_type);
-    m_data.trial{t} = mEnv;
+    %m_data.trial{t} = mEnv;
  
     o{t}.fc_type  = fc_type;
     o{t}.band     = cfg.bpfreq; 
@@ -575,7 +575,8 @@ for t = 1 : nTrial % virtual resection
         
             % virtual resection with partialization
             m_data   = removeNoNLinear_ch(m_data,idx2rm); 
-            C2       = fc(m_data.trial{t},fc_type);
+            mEnv     = get_Envelope(cfg,m_data.trial{t});
+            C2       = fc(mEnv,fc_type);
             o{t}.C2  = C2;
             
         else % no need to remove channels (it should not happen given the data)

@@ -116,8 +116,8 @@ for i = 1 : numel(coh_tc)
         m_v2(1:length(m_v2)+1:end)     = 0;
         m_post(1:length(m_post)+1:end) = 0;
         
-        max_t(j) = max([max(abs(m_pre(:))),max(abs(m_v1(:))),max(abs(m_v2(:))),max(abs(m_post(:)))]);
-        min_t(j) = min([min(abs(m_pre(:))),min(abs(m_v1(:))),min(abs(m_v2(:))),min(abs(m_post(:)))]);
+        max_t(j) = max([max((m_pre(:))),max((m_v1(:))),max((m_v2(:))),max((m_post(:)))]);
+        min_t(j) = min([min((m_pre(:))),min((m_v1(:))),min((m_v2(:))),min((m_post(:)))]);
     end
     
     c_max = max(max_t); 
@@ -246,7 +246,7 @@ function [avg_fc]= get_Stats(m)
         % put zeros on the diagonal
         m(1:length(m)+1:end)   = 0;
         
-        avg_fc = get_Gfc(abs(m)); % FIX abs value if it is correlation 
+        avg_fc = get_Gfc((m)); % FIX abs value if it is correlation 
         
         %mask = true(size(m));
         
