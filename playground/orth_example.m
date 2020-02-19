@@ -10,7 +10,7 @@ y = 1 + 2*1i;
 
 compass(real(x),imag(x),'b');
 hold
-compass(real(x),imag(x'),'b--');
+%compass(real(x),imag(x'),'b--');
 
 compass(real(y),imag(y),'r');
 
@@ -24,16 +24,16 @@ y_coord = [real(y) imag(y)];
 
 compass(x_orth_coord(1),x_orth_coord(2),'g');
 
-compass(y_orth_coord(1),y_orth_coord(2),'k');
+%compass(y_orth_coord(1),y_orth_coord(2),'k');
 
 
-compass(proj_x(1),proj_x(2),'m');
+%compass(proj_x(1),proj_x(2),'m');
 
 compass(proj_y(1),proj_y(2),'c');
 
 x_ortho2 = get_ortho2(x,y);
 
-compass(real(x_ortho2),imag(x_ortho2),'y');
+%compass(real(x_ortho2),imag(x_ortho2),'g--');
 
 function  [ortho, proj ] = get_ortho(x,y)
     
