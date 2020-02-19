@@ -40,7 +40,7 @@ ylim(ay_lim)
 omm = om + repmat([0, 10]',1,size(om,2));
 subplot(1,3,3)
 plot(omm')
-title('Orthogonalized')
+title('After partialization')
 ylim(ay_lim)
 
 % correlation matrices
@@ -63,7 +63,7 @@ title('Naive')
 subplot(2,2,4)
 
 imagesc(abs(corr(om')),imLim)
-title('Orthogonalized')
+title('After partialization')
 
 colorbar('manual','Position',[0.93,0.1,0.03,0.8])
 
@@ -92,7 +92,7 @@ ylim(ay_lim)
 pmm = pm + repmat([0, 10]',1,size(pm,2));
 subplot(1,3,3)
 plot(pmm')
-title('Orthogonalized')
+title('After partialization')
 ylim(ay_lim)
 
 % correlation matrices
