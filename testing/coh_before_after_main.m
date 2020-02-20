@@ -28,7 +28,7 @@ for i = 1: numel(subjName)
     cfg.subjName        = subjName{i};
     cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
     cfg.fc_type         = 'h2';
-    cfg.L               = 60;
+    cfg.L               = 5;
     cfg.overlap         = 0;
     
     cfg.Tlength         = 5; %seconds of new trials
@@ -107,7 +107,7 @@ for s = 1 : numel(situationName)
         if(status == 0) 
             maxtime = max(cellfun(@length,data.time));
             if(  maxtime > L*data.fsample )
-                % use the last minute
+                % use the last minute or all recording
                 cfgRe         = [];
                 cfgRe.trials  = 'all';
                 cfgRe.length  = L; %seconds of new trials
@@ -117,7 +117,7 @@ for s = 1 : numel(situationName)
 
                 cfgLastEp         = [];
                 ntrials           = size(data.trial,2);
-                cfgLastEp.trials  = ntrials;
+                cfgLastEp.trials  = 'all';%ntrials;
                 cfgLastEp.channel = {'Gr*'};
                 m_data            = ft_selectdata(cfgLastEp,data); 
                 
@@ -137,9 +137,9 @@ for s = 1 : numel(situationName)
                 % remove artefacts
 
                 [ res_channel, artefact_T]     = get_metadata(bidsFolder,sitFName);
-                [idxChArtefact ,idx_art_trial] = find_artefacts(m_data.sampleinfo,m_data.label,artefact_T);
-                cfgCH.channel                  = m_data.label(~idxChArtefact);
-                m_data                         = ft_preprocessing(cfgCH,m_data);  
+                %[idxChArtefact ,idx_art_trial] = find_artefacts(m_data.sampleinfo,m_data.label,artefact_T);
+                %cfgCH.channel                  = m_data.label(~idxChArtefact);
+                %m_data                         = ft_preprocessing(cfgCH,m_data);  
                 
                 %% Select 'homogeneous trials'
                % cfgScore.freqRange      = cfg.ScoreFreqRange;
@@ -150,11 +150,11 @@ for s = 1 : numel(situationName)
                 %[idx_best_trial,~,scores] = scorEpochs(cfgScore,m_data.trial{1});
                 
                 %% redefine trials
-                 cfgReTrials.trials  = 'all';
+                 %cfgReTrials.trials  = 'all';
                  cfgReTrials.length  = cfg.Tlength; %seconds of new trials
                  cfgReTrials.overlap = cfg.Toverlap;
  
-                 m_data = ft_redefinetrial(cfgReTrials,m_data);
+                 %m_data = ft_redefinetrial(cfgReTrials,m_data);
                
                  
                  
@@ -342,7 +342,7 @@ for s = 1 : numel(situationName)
 
                 cfgLastEp         = [];
                 ntrials           = size(data.trial,2);
-                cfgLastEp.trials  = ntrials;
+                cfgLastEp.trials  = 'all';%ntrials;
                 cfgLastEp.channel = {'Gr*'};
                 m_data            = ft_selectdata(cfgLastEp,data); 
                 
@@ -362,9 +362,9 @@ for s = 1 : numel(situationName)
                 % remove artefacts
 
                 [ res_channel, artefact_T]     = get_metadata(bidsFolder,sitFName);
-                [idxChArtefact ,idx_art_trial] = find_artefacts(m_data.sampleinfo,m_data.label,artefact_T);
-                cfgCH.channel                  = m_data.label(~idxChArtefact);
-                m_data                         = ft_preprocessing(cfgCH,m_data);  
+                %[idxChArtefact ,idx_art_trial] = find_artefacts(m_data.sampleinfo,m_data.label,artefact_T);
+                %cfgCH.channel                  = m_data.label(~idxChArtefact);
+                %m_data                         = ft_preprocessing(cfgCH,m_data);  
                 
                 
                 
@@ -377,11 +377,11 @@ for s = 1 : numel(situationName)
                 %[idx_best_trial,~,scores] = scorEpochs(cfgScore,m_data.trial{1});
                 
                 %% redefine trials
-                 cfgReTrials.trials  = 'all';
-                 cfgReTrials.length  = cfg.Tlength; %seconds of new trials
-                 cfgReTrials.overlap = cfg.Toverlap;
+                 %cfgReTrials.trials  = 'all';
+                 %cfgReTrials.length  = cfg.Tlength; %seconds of new trials
+                 %cfgReTrials.overlap = cfg.Toverlap;
  
-                 m_data = ft_redefinetrial(cfgReTrials,m_data);
+                 %m_data = ft_redefinetrial(cfgReTrials,m_data);
                
                  
                  

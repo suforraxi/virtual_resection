@@ -47,11 +47,17 @@ for s = 1: numel(subjNames)
     end
 end
 
+
+
+
+
 % plot synchronizability
 fig    = zeros(1,numel(coh_tc));
 
 co     = [1 0 0; 0 0 1; 0 0 0; 0 1 0 ; 1 1 0; 0 1 1;1 0 1];
 Lwidth = 1.5;
+
+
 % for i = 1 : numel(coh_tc)
 %    
 %     fig(i) = figure;
@@ -91,93 +97,169 @@ Lwidth = 1.5;
 % end
 
 % plot functinal connectivity matrix
-fig    = zeros(1,numel(coh_tc));
-nr     = 4;
-nTrial = numel(coh_tc{1}.Cpre);
-    
-fSizeMatrix = 12;
- 
+% fig    = zeros(1,numel(coh_tc));
+% nr     = 4;
+% nTrial = numel(coh_tc{1}.Cpre);
+%     
+% fSizeMatrix = 12;
+%  
+% 
+% for i = 1 : numel(coh_tc)
+%    
+%     fig(i) = figure;
+%     max_t = zeros(1,nTrial);
+%     min_t = zeros(1,nTrial);
+%     
+%     for j = 1 : nTrial
+%         
+%         m_pre  = coh_tc{i}.Cpre{j};
+%         m_v1   = coh_tc{i}.C1{j};
+%         m_v2   = coh_tc{i}.C2{j};
+%         m_post = coh_tc{i}.Cpost{j};
+%         
+%         m_pre(1:length(m_pre)+1:end)   = 0;
+%         m_v1(1:length(m_v1)+1:end)     = 0;
+%         m_v2(1:length(m_v2)+1:end)     = 0;
+%         m_post(1:length(m_post)+1:end) = 0;
+%         
+%         max_t(j) = max([max((m_pre(:))),max((m_v1(:))),max((m_v2(:))),max((m_post(:)))]);
+%         min_t(j) = min([min((m_pre(:))),min((m_v1(:))),min((m_v2(:))),min((m_post(:)))]);
+%     end
+%     
+%     c_max = max(max_t); 
+%     c_min = min(min_t);
+%     
+%     for j = 1 : nTrial
+%         
+%         m_pre  = coh_tc{i}.Cpre{j};
+%         m_v1   = coh_tc{i}.C1{j};
+%         m_v2   = coh_tc{i}.C2{j};
+%         m_post = coh_tc{i}.Cpost{j};
+%         
+%         m_pre(1:length(m_pre)+1:end)   = 0;
+%         m_v1(1:length(m_v1)+1:end)     = 0;
+%         m_v2(1:length(m_v2)+1:end)     = 0;
+%         m_post(1:length(m_post)+1:end) = 0;
+%         
+%         subplot(nr,nTrial,j)
+%         imagesc(abs(m_pre),[c_min,c_max]);
+%         title(sprintf('Trial %i',j))
+%         subplot(nr,nTrial,j+nTrial)
+%         imagesc(abs(m_v1),[c_min,c_max]);
+%         subplot(nr,nTrial,j+2*nTrial)
+%         imagesc(abs(m_v2),[c_min,c_max]);
+%         subplot(nr,nTrial,j+3*nTrial)
+%         imagesc(abs(m_post),[c_min,c_max]);
+%         
+%         
+%     end
+%     
+%     subplot(nr,nTrial,1)
+%     ylabel(sprintf('%s Pre',subjNames{i}),'FontSize',fSizeMatrix)
+%     subplot(nr,nTrial,nTrial+1)
+%     ylabel('VR_{naive}','FontSize',fSizeMatrix)
+%     subplot(nr,nTrial,2*nTrial+1)
+%     ylabel('Vr_{ortho}','FontSize',fSizeMatrix)
+%     subplot(nr,nTrial,3*nTrial+1)
+%     ylabel('Post','FontSize',fSizeMatrix)
+%     
+%    
+%     colorbar('manual','Position',[0.94 0.1 0.02 0.2])
+%    
+%     
+% end
+% 
 
+% % save  functional connectivity matrices
+% outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/matrix/';
+% if(~exist(outFolder,'dir'))
+%     mkdir(outFolder)
+% end
+% for i = 1 : numel(fig)
+% 
+%     set(fig(i),'WindowState','fullscreen')
+%     outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','matrix'));
+%     print(fig(i),outfile,'-djpeg');
+%     close(fig(i))
+% end
+
+% global connectivity
+
+%plot_global(coh_tc,subjNames,Lwidth,co)
+plot_global_all_epochs(coh_tc,subjNames,Lwidth,co)
+function plot_global_all_epochs(coh_tc,subjNames,Lwidth,co)
+
+fig     = zeros(1,numel(coh_tc));
+nTrial  = numel(coh_tc{1}.Cpre);
+
+
+nr      = 4;
 for i = 1 : numel(coh_tc)
    
     fig(i) = figure;
-    max_t = zeros(1,nTrial);
-    min_t = zeros(1,nTrial);
     
-    for j = 1 : nTrial
-        
-        m_pre  = coh_tc{i}.Cpre{j};
-        m_v1   = coh_tc{i}.C1{j};
-        m_v2   = coh_tc{i}.C2{j};
-        m_post = coh_tc{i}.Cpost{j};
-        
-        m_pre(1:length(m_pre)+1:end)   = 0;
-        m_v1(1:length(m_v1)+1:end)     = 0;
-        m_v2(1:length(m_v2)+1:end)     = 0;
-        m_post(1:length(m_post)+1:end) = 0;
-        
-        max_t(j) = max([max((m_pre(:))),max((m_v1(:))),max((m_v2(:))),max((m_post(:)))]);
-        min_t(j) = min([min((m_pre(:))),min((m_v1(:))),min((m_v2(:))),min((m_post(:)))]);
-    end
+    %subplot(1,2,2)
+    %avg_fc  = zeros(nr,nTrial);
+  
+    pre_v  = cellfun(@get_Stats,coh_tc{i}.Cpre);
+    v1_v   = cellfun(@get_Stats,coh_tc{i}.C1);
+    v2_v   = cellfun(@get_Stats,coh_tc{i}.C2);
+    post_v = cellfun(@get_Stats,coh_tc{i}.Cpost);
     
-    c_max = max(max_t); 
-    c_min = min(min_t);
+     val    = [pre_v , post_v, v1_v, v2_v];
+     labels = [repmat({'pre'},1,numel(pre_v)) , repmat({'post'},1,numel(post_v)), ...
+               repmat({'VR_{Naive}'},1,numel(v1_v)) , repmat({'VR_{Ortho}'},1,numel(v2_v)), ...
+              ];
     
-    for j = 1 : nTrial
-        
-        m_pre  = coh_tc{i}.Cpre{j};
-        m_v1   = coh_tc{i}.C1{j};
-        m_v2   = coh_tc{i}.C2{j};
-        m_post = coh_tc{i}.Cpost{j};
-        
-        m_pre(1:length(m_pre)+1:end)   = 0;
-        m_v1(1:length(m_v1)+1:end)     = 0;
-        m_v2(1:length(m_v2)+1:end)     = 0;
-        m_post(1:length(m_post)+1:end) = 0;
-        
-        subplot(nr,nTrial,j)
-        imagesc(abs(m_pre),[c_min,c_max]);
-        title(sprintf('Trial %i',j))
-        subplot(nr,nTrial,j+nTrial)
-        imagesc(abs(m_v1),[c_min,c_max]);
-        subplot(nr,nTrial,j+2*nTrial)
-        imagesc(abs(m_v2),[c_min,c_max]);
-        subplot(nr,nTrial,j+3*nTrial)
-        imagesc(abs(m_post),[c_min,c_max]);
-        
-        
-    end
-    
-    subplot(nr,nTrial,1)
-    ylabel(sprintf('%s Pre',subjNames{i}),'FontSize',fSizeMatrix)
-    subplot(nr,nTrial,nTrial+1)
-    ylabel('VR_{naive}','FontSize',fSizeMatrix)
-    subplot(nr,nTrial,2*nTrial+1)
-    ylabel('Vr_{ortho}','FontSize',fSizeMatrix)
-    subplot(nr,nTrial,3*nTrial+1)
-    ylabel('Post','FontSize',fSizeMatrix)
-    
+     violinplot(val,labels);     
+%     for j = 1 : nTrial
+%         
+%         m_pre  = coh_tc{i}.Cpre{j};
+%         m_v1   = coh_tc{i}.C1{j};
+%         m_v2   = coh_tc{i}.C2{j};
+%         m_post = coh_tc{i}.Cpost{j};
+%        
+%         avg_fc(1,j) = get_Stats(m_pre);
+%         avg_fc(2,j) = get_Stats(m_post);
+%         avg_fc(3,j) = get_Stats(m_v1);
+%         avg_fc(4,j) = get_Stats(m_v2);
+%         
+%     end
+%     
+    %set(fig(i),'defaultAxesColorOrder',co)
+    %plot(avg_fc','o-','LineWidth',Lwidth);
+    %legend({'pre','post','VR_{Naive}','VR_{Ortho}'});
+    %title(subjNames{i})
+    %ylabel('Global Connectivity')
+    %xlabel('Trials')
+    %ylim([0 1])
+  
+    %subplot(1,2,2)
+    %notBoxPlot(avg_fc')
    
-    colorbar('manual','Position',[0.94 0.1 0.02 0.2])
-   
+    
+    %xticklabels({'pre','post','VR_{Naive}','VR_{Ortho}'});
+    ylabel('Global Connectivity')
+    title(subjNames{i})
+    ylim([0 0.5])
     
 end
 
-
-% save  functional connectivity matrices
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/matrix/';
+% save global functional connectivity
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/global/';
 if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
 for i = 1 : numel(fig)
 
     set(fig(i),'WindowState','fullscreen')
-    outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','matrix'));
+    outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','global'));
     print(fig(i),outfile,'-djpeg');
     close(fig(i))
 end
 
-% global connectivity
+
+function plot_global(coh_tc,subjNames,Lwidth,co)
 
 fig     = zeros(1,numel(coh_tc));
 nTrial  = numel(coh_tc{1}.Cpre);
