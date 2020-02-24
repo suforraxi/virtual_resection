@@ -1,6 +1,6 @@
 function plot_coh_timecourse()
 
-inFolder = '/home/matteo/Desktop/virtual_resection/coh/';
+inFolder = '/home/matteo/Desktop/virtual_resection/coh/h2_all_epochs';
 
 inFiles  = dir(fullfile(inFolder,'*.mat'));
 
