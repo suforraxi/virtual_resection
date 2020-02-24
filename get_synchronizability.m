@@ -6,16 +6,19 @@
 %
 % OUTPUT
 % 
-% coh   - global coherence as the ratio of weighted (using eigenvectors) eigenvalues 
+% syn   - 'synchronizability' as the ratio of weighted (using eigenvectors) eigenvalues
+%              
 % V     - eigenvectors matrix
 % E     - eigenvalues  matrix
-function [coh, V, E] = get_coherence(C)
+
+function [syn, V, E] = get_coherence(C)
+
 
 % eigen-value decopmposition
 [V,E] = eig(C); 
 
 
-nEig = size(V,1);
+%nEig = size(V,1);
 %f    = zeros(1,nEig); 
 f    = E*(mean(V.^2)./max(V.^2))';
 
@@ -25,5 +28,9 @@ f    = E*(mean(V.^2)./max(V.^2))';
 %     f(i) = E(i,i) * (mean(V(:,i).^2)/max(V(:,i).^2)); 
 %  end
 %  
-coh = max(f)/sum(f);
+syn = max(f)/sum(f);
+
+
+% kini 2019
+
 
