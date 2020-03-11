@@ -58,8 +58,24 @@ switch fc_type
             
             end 
         end
-        
+    
+    case 'pli' 
+    
+        h          = hilbert(x'); 
 
+        for i = 1 : nch
+            for j = 1 : nch
+                if i<j
+
+                    C(i,j)  = abs( mean(sign( (angle( h(:,i).*conj(h(:,j)) ) ) ) ) ) ;
+
+                end 
+            end 
+        end
+
+        C              = C + C';
+        C(1:nch+1:end) = 1;
+    
 end
 
 

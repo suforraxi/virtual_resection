@@ -11,26 +11,20 @@
 % V     - eigenvectors matrix
 % E     - eigenvalues  matrix
 
-function [syn, V, E] = get_coherence(C)
+function [syn, V, E] = get_synchronizability(C)
 
 
 % eigen-value decopmposition
 [V,E] = eig(C); 
 
-
-%nEig = size(V,1);
-%f    = zeros(1,nEig); 
-f    = E*(mean(V.^2)./max(V.^2))';
-
-
-%  for i = 1 : nEig
-%  
-%     f(i) = E(i,i) * (mean(V(:,i).^2)/max(V(:,i).^2)); 
-%  end
-%  
-syn = max(f)/sum(f);
+% weighted ratio
+%f    = E*(mean(V.^2)./max(V.^2))';
+%syn = max(f)/sum(f);
 
 
 % kini 2019
 
+ord_E = sort(diag(E),'ascend');
 
+% second smallest eigenvalue over max eigenvalue
+syn   = ord_E(2)/ord_E(end);

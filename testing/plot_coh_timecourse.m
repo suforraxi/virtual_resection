@@ -1,6 +1,6 @@
 function plot_coh_timecourse()
 
-inFolder = '/home/matteo/Desktop/virtual_resection/coh/h2_all_epochs';
+inFolder = '/home/matteo/Desktop/virtual_resection/syn/h2';
 
 inFiles  = dir(fullfile(inFolder,'*.mat'));
 
@@ -23,18 +23,26 @@ for s = 1: numel(subjNames)
         switch sit_res{1}.sitType
            
             case 'Pre'
-                  %coh_tc{s}.pre_coh_v   = cellfun(@getfield,sit_res,repmat({'coh'},1,numel(sit_res)));
+                  if(any(strcmp('syn',fieldnames(sit_res{1}))))
+                    coh_tc{s}.pre_syn_v   = cellfun(@getfield,sit_res,repmat({'syn'},1,numel(sit_res)));
+                    coh_tc{s}.virt1_syn_v = cellfun(@getfield,sit_res,repmat({'V1syn'},1,numel(sit_res)));
+                    coh_tc{s}.virt2_syn_v = cellfun(@getfield,sit_res,repmat({'V2syn'},1,numel(sit_res)));
+                  end
+                  
+                  
                   coh_tc{s}.Cpre        = cellfun(@getfield,sit_res,repmat({'C'},1,numel(sit_res)),'UniformOutput',false);
                    
-                  %coh_tc{s}.virt1_coh_v = cellfun(@getfield,sit_res,repmat({'V1coh'},1,numel(sit_res)));
+                  
                   coh_tc{s}.C1           = cellfun(@getfield,sit_res,repmat({'C1'},1,numel(sit_res)),'UniformOutput',false);
                   
-                  %coh_tc{s}.virt2_coh_v = cellfun(@getfield,sit_res,repmat({'V2coh'},1,numel(sit_res)));
+                  
                   coh_tc{s}.C2          = cellfun(@getfield,sit_res,repmat({'C2'},1,numel(sit_res)),'UniformOutput',false);
                     
                
             case 'Post'
-                  %coh_tc{s}.post_coh_v  = cellfun(@getfield,sit_res,repmat({'coh'},1,numel(sit_res)));
+                 if(any(strcmp('syn',fieldnames(sit_res{1}))))
+                    coh_tc{s}.post_syn_v  = cellfun(@getfield,sit_res,repmat({'syn'},1,numel(sit_res)));
+                 end
                   coh_tc{s}.Cpost       = cellfun(@getfield,sit_res,repmat({'C'},1,numel(sit_res)),'UniformOutput',false);
         end
         
@@ -43,7 +51,8 @@ for s = 1: numel(subjNames)
                                  '_ep_',num2str(sit_res{1}.epoch),...
                                  '_band_',num2str(sit_res{1}.band(1)),'_',num2str(sit_res{1}.band(end)),...
                                  '_fc_',sit_res{1}.fc_type ...
-                                 );     
+                                 );    
+       coh_tc{s}.fc_type = sit_res{1}.fc_type;
     end
 end
 
@@ -62,14 +71,14 @@ Lwidth = 1.5;
 %    
 %     fig(i) = figure;
 %     set(fig(i),'defaultAxesColorOrder',co)
-%     plot(coh_tc{i}.pre_coh_v,'o-','LineWidth',Lwidth)
+%     plot(coh_tc{i}.pre_syn_v,'o-','LineWidth',Lwidth)
 %     hold
 %     %plot(repmat(mean(coh_tc{i}.pre_coh_v),1,length(coh_tc{i}.pre_coh_v)),'r--')
-%     plot(coh_tc{i}.post_coh_v,'o-','LineWidth',Lwidth)
+%     plot(coh_tc{i}.post_syn_v,'o-','LineWidth',Lwidth)
 %     %plot(repmat(mean(coh_tc{i}.post_coh_v),1,length(coh_tc{i}.post_coh_v)),'b--')
-%     plot(coh_tc{i}.virt1_coh_v,'o-','LineWidth',Lwidth)
+%     plot(coh_tc{i}.virt1_syn_v,'o-','LineWidth',Lwidth)
 %     %plot(repmat(mean(coh_tc{i}.virt1_coh_v),1,length(coh_tc{i}.virt1_coh_v)),'k--')
-%     plot(coh_tc{i}.virt2_coh_v,'o-','LineWidth',Lwidth)
+%     plot(coh_tc{i}.virt2_syn_v,'o-','LineWidth',Lwidth)
 %     %plot(repmat(mean(coh_tc{i}.virt2_coh_v),1,length(coh_tc{i}.virt2_coh_v)),'g--')
 %     
 %     
@@ -169,7 +178,7 @@ Lwidth = 1.5;
 %     
 % end
 % 
-
+% 
 % % save  functional connectivity matrices
 % outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/matrix/';
 % if(~exist(outFolder,'dir'))
@@ -183,10 +192,62 @@ Lwidth = 1.5;
 %     close(fig(i))
 % end
 
+
+% plot synchronizability
+ if(any(strcmp('pre_syn_v',fieldnames(coh_tc{1}))))
+    plot_syn_epochs(coh_tc,subjNames,Lwidth,co)
+ end
 % global connectivity
 
 %plot_global(coh_tc,subjNames,Lwidth,co)
 plot_global_all_epochs(coh_tc,subjNames,Lwidth,co)
+
+
+function plot_syn_epochs(coh_tc,subjNames,Lwidth,co)
+
+%fig     = zeros(1,numel(coh_tc));
+nTrial  = numel(coh_tc{1}.Cpre);
+
+
+nr      = 4;
+fig     = figure;
+for i = 1 : numel(coh_tc)
+   
+    
+   
+    subplot(2,4,i)
+    
+    pre_v  = coh_tc{i}.pre_syn_v;
+    v1_v   = coh_tc{i}.virt1_syn_v;
+    v2_v   = coh_tc{i}.virt2_syn_v;
+    post_v = coh_tc{i}.post_syn_v;
+    
+     val    = [pre_v , post_v, v1_v, v2_v];
+     labels = [repmat({'pre'},1,numel(pre_v)) , repmat({'post'},1,numel(post_v)), ...
+               repmat({'VR_{Naive}'},1,numel(v1_v)) , repmat({'VR_{Ortho}'},1,numel(v2_v)), ...
+              ];
+    
+    violinplot(val,labels);     
+
+    ylabel('Synchronizability')
+    title(subjNames{i})
+    %ylim([0 1])
+    
+end
+
+% save global functional connectivity
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects_syn_one_minute/';
+if(~exist(outFolder,'dir'))
+    mkdir(outFolder)
+end
+for i = 1 : numel(fig)
+
+    set(fig(i),'WindowState','fullscreen')
+    outfile = fullfile(outFolder,strcat('all_subjects','_',coh_tc{1}.fc_type,'_','syn'));
+    print(fig(i),outfile,'-djpeg');
+    close(fig(i))
+end
+
 function plot_global_all_epochs(coh_tc,subjNames,Lwidth,co)
 
 fig     = zeros(1,numel(coh_tc));
@@ -194,11 +255,19 @@ nTrial  = numel(coh_tc{1}.Cpre);
 
 
 nr      = 4;
+fig     = figure;
+cv      = zeros(nr,numel(coh_tc));
+mu      = zeros(nr,numel(coh_tc));
+err     = zeros(nr,numel(coh_tc));
+h       = zeros(3,numel(coh_tc));
+p       = zeros(3,numel(coh_tc));
+
+relErr = @(x,y) std(x);%abs((mean(x)-mean(y)));
 for i = 1 : numel(coh_tc)
    
-    fig(i) = figure;
     
-    %subplot(1,2,2)
+    
+    subplot(2,4,i)
     %avg_fc  = zeros(nr,nTrial);
   
     pre_v  = cellfun(@get_Stats,coh_tc{i}.Cpre);
@@ -206,58 +275,52 @@ for i = 1 : numel(coh_tc)
     v2_v   = cellfun(@get_Stats,coh_tc{i}.C2);
     post_v = cellfun(@get_Stats,coh_tc{i}.Cpost);
     
-     val    = [pre_v , post_v, v1_v, v2_v];
-     labels = [repmat({'pre'},1,numel(pre_v)) , repmat({'post'},1,numel(post_v)), ...
-               repmat({'VR_{Naive}'},1,numel(v1_v)) , repmat({'VR_{Ortho}'},1,numel(v2_v)), ...
-              ];
+    err(1,i)  = relErr(pre_v,post_v);
+    err(2,i)  = relErr(v1_v,post_v);
+    err(3,i)  = relErr(v2_v,post_v);
+    err(4,i)  = relErr(post_v,post_v);
     
-     violinplot(val,labels);     
-%     for j = 1 : nTrial
-%         
-%         m_pre  = coh_tc{i}.Cpre{j};
-%         m_v1   = coh_tc{i}.C1{j};
-%         m_v2   = coh_tc{i}.C2{j};
-%         m_post = coh_tc{i}.Cpost{j};
-%        
-%         avg_fc(1,j) = get_Stats(m_pre);
-%         avg_fc(2,j) = get_Stats(m_post);
-%         avg_fc(3,j) = get_Stats(m_v1);
-%         avg_fc(4,j) = get_Stats(m_v2);
-%         
-%     end
-%     
-    %set(fig(i),'defaultAxesColorOrder',co)
-    %plot(avg_fc','o-','LineWidth',Lwidth);
-    %legend({'pre','post','VR_{Naive}','VR_{Ortho}'});
-    %title(subjNames{i})
-    %ylabel('Global Connectivity')
-    %xlabel('Trials')
-    %ylim([0 1])
-  
-    %subplot(1,2,2)
-    %notBoxPlot(avg_fc')
-   
+    [h(1,i),p(1,i)] = kstest2(pre_v,post_v,'Tail','smaller','Alpha',0.01);
+    [h(2,i),p(2,i)] = kstest2(v1_v,post_v,'Tail','unequal','Alpha',0.01);
+    [h(3,i),p(3,i)] = kstest2(v2_v,post_v,'Tail','unequal','Alpha',0.01);
     
-    %xticklabels({'pre','post','VR_{Naive}','VR_{Ortho}'});
+    
+    
+    val    = [pre_v , post_v, v1_v, v2_v];
+    labels = [repmat({'pre'},1,numel(pre_v)) , repmat({'post'},1,numel(post_v)), ...
+               repmat({'VR_{Naive}'},1,numel(v1_v)) , repmat({'VR_{partialization}'},1,numel(v2_v)), ...
+             ];
+    
+    violinplot(val,labels,'showMean',true);     
+
     ylabel('Global Connectivity')
     title(subjNames{i})
-    ylim([0 0.5])
+    ylim([0 0.6])
+    
+    
+    
     
 end
 
 % save global functional connectivity
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/global/';
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects_global_one_minute/';
 if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
-for i = 1 : numel(fig)
+if(numel(fig) == 1)
+        set(fig,'WindowState','fullscreen')
+        outfile = fullfile(outFolder,strcat('all_subjects','_',coh_tc{1}.fc_type,'_','global'));
+        print(fig,outfile,'-djpeg');
+        close(fig)
+else
+    for i = 1 : numel(fig)
 
-    set(fig(i),'WindowState','fullscreen')
-    outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','global'));
-    print(fig(i),outfile,'-djpeg');
-    close(fig(i))
+        set(fig(i),'WindowState','fullscreen')
+        outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','global'));
+        print(fig(i),outfile,'-djpeg');
+        close(fig(i))
+    end
 end
-
 
 function plot_global(coh_tc,subjNames,Lwidth,co)
 
@@ -328,7 +391,7 @@ function [avg_fc]= get_Stats(m)
         % put zeros on the diagonal
         m(1:length(m)+1:end)   = 0;
         
-        avg_fc = get_Gfc((m)); % FIX abs value if it is correlation 
+        avg_fc = get_Gfc(abs(m)); % FIX abs value if it is correlation 
         
         %mask = true(size(m));
         

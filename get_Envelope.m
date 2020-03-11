@@ -2,7 +2,7 @@
 %
 % INPUT
 % cfg     - configuration struct with the following fields
-%           type                       - type of computation for the envelope it could be 
+%           EnvType                       - type of computation for the envelope it could be 
 %
 %                                       'filt_hilbert_env' assuming the time-series is band filtered it computes the envelope using Hilbert
 %
@@ -22,7 +22,7 @@
 function e_m = get_Envelope(cfg,m)
     
     e_m = zeros(size(m));
-    switch cfg.type
+    switch cfg.EnvType
         case 'filt_hilbert_env'    
               e_m = hilbert(m');
               e_m = abs(e_m)';
