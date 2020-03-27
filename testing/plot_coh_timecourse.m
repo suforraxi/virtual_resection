@@ -1,6 +1,6 @@
 function plot_coh_timecourse()
 
-inFolder = '/home/matteo/Desktop/virtual_resection/syn/h2';
+inFolder = '/home/matteo/Desktop/virtual_resection/syn/h2_all_epochs/';
 
 inFiles  = dir(fullfile(inFolder,'*.mat'));
 
@@ -236,7 +236,7 @@ for i = 1 : numel(coh_tc)
 end
 
 % save global functional connectivity
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects_syn_one_minute/';
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects/';
 if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
@@ -256,18 +256,18 @@ nTrial  = numel(coh_tc{1}.Cpre);
 
 nr      = 4;
 fig     = figure;
-cv      = zeros(nr,numel(coh_tc));
+vari     = zeros(nr,numel(coh_tc));
 mu      = zeros(nr,numel(coh_tc));
 err     = zeros(nr,numel(coh_tc));
 h       = zeros(3,numel(coh_tc));
 p       = zeros(3,numel(coh_tc));
 
-relErr = @(x,y) std(x);%abs((mean(x)-mean(y)));
+relErr = @(m,x,y) m(y,x);%@(m,x,y) abs((m(x)-m(y))/m(y));%abs((mean(x)-mean(y)));
 for i = 1 : numel(coh_tc)
    
     
     
-    subplot(2,4,i)
+    subplot(4,2,i)
     %avg_fc  = zeros(nr,nTrial);
   
     pre_v  = cellfun(@get_Stats,coh_tc{i}.Cpre);
@@ -275,10 +275,19 @@ for i = 1 : numel(coh_tc)
     v2_v   = cellfun(@get_Stats,coh_tc{i}.C2);
     post_v = cellfun(@get_Stats,coh_tc{i}.Cpost);
     
-    err(1,i)  = relErr(pre_v,post_v);
-    err(2,i)  = relErr(v1_v,post_v);
-    err(3,i)  = relErr(v2_v,post_v);
-    err(4,i)  = relErr(post_v,post_v);
+    mu(1,i)  = mean(pre_v);
+    mu(2,i)  = mean(v1_v);
+    mu(3,i)  = mean(v2_v);
+    mu(4,i)  = mean(post_v);
+    
+    
+    vari(1,i)  = std(pre_v);
+    vari(2,i)  = std(v1_v);
+    vari(3,i)  = std(v2_v);
+    vari(4,i)  = std(post_v);
+    
+    
+    
     
     [h(1,i),p(1,i)] = kstest2(pre_v,post_v,'Tail','smaller','Alpha',0.01);
     [h(2,i),p(2,i)] = kstest2(v1_v,post_v,'Tail','unequal','Alpha',0.01);
@@ -292,18 +301,25 @@ for i = 1 : numel(coh_tc)
              ];
     
     violinplot(val,labels,'showMean',true);     
-
+    hold
+    line([0 4.5],[0.1 0.1],'LineStyle','--','Color','green') 
     ylabel('Global Connectivity')
     title(subjNames{i})
-    ylim([0 0.6])
+    %ylim([0 0.45])
     
     
     
     
 end
 
+(vari-repmat(vari(1,:),4,1))./repmat(vari(1,:),4,1)*100
+(mu-repmat(mu(1,:),4,1))./repmat(mu(1,:),4,1)*100
+cv = vari./mu
+(cv-repmat(cv(1,:),4,1))./repmat(cv(1,:),4,1)*100
+
+
 % save global functional connectivity
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects_global_one_minute/';
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_epochs/';
 if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
