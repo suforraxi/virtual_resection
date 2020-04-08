@@ -42,9 +42,9 @@ addpath(fullfile(git_root,'jsonlab'))
 
 % virtual resection
 addpath(fullfile(git_root,'virtual_resection'))
-addpath(fullfile(git_root,'virtual_resection','import_trc'))
+%addpath(fullfile(git_root,'virtual_resection','import_trc'))
 addpath(fullfile(git_root,'virtual_resection','montage'))
-%addpath(fullfile(git_root,'virtual_resection','testing'))
+addpath(fullfile(git_root,'virtual_resection','analysis_util'))
 addpath(fullfile(git_root,'virtual_resection','external'))
 
 % add violin plot functions (https://github.com/bastibe/Violinplot-Matlab)

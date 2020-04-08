@@ -2,10 +2,8 @@
 
 function virtual_resection_main()
 
-path_settings();
 % add dependecies
-%addpath('/home/matteo/Desktop/git_rep/epi/matlab/episign/biomarker_pipeline/')
-%addpath('/home/matteo/Desktop/git_rep/epi/matlab/stiliyan/matLabTools/');
+path_settings();
 
 % BIDS input folder 
 bidsFolder = '/home/matteo/Desktop/virtual_resection/sel_data/';
