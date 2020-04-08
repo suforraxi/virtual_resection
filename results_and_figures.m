@@ -1,28 +1,8 @@
 % Save figures and tables of the analysis
 %
-% 1) Main figure (figFname) showing fot each subject the comparision between the distribuion of global functional connectivity
-%    for the four condition: 
-%      - pre-resection
-%      - post-resection
-%      - virtual resection after partialization
-%      - naive virtual resection 
-%   
-% 2) Text file (resFname) summarizing: 
-%     - the number of subjects for whom it was not possible formulate a prediction
-%     - number of successful predictions for naive virtual resection
-%     - number of successful predictions for virtual resection after
-%       partialization
-%       
-% 3) text file (tabFname) witha table containing:
-%                - as variable names patients names for whom it was possible to make a prediction
-%                - as rows the three tested conditions for the patients for whom it was possible to formulate a prediction
-%                  (pre-resection vs post-resection, pre-resection vs naive virtual, pre-resection vs virtual with partialization )
-%                - as values the p-values of Kolmogorov-Smirnov test
+%  see Demuru et al. doi: 
 %
-%
-%
-%
-%
+
 
 function results_and_figures()
 
@@ -79,23 +59,30 @@ end
 plot_global_all_epochs(fc_res,subjNames,outFolder,figFname,resFname,tabFname)
 
 % 
-%  plot violinplots for every subject:
-%
-% - distribution of global connectivity values (per epoch) after naive
-%   virtual resection on pre-resection recordings
-%
-% - distribution of global connectivity values (per epoch) after virtual
-%   resection with partlialization on pre-resection recordings 
-%
-% - distribution of global connectivity values (per epoch) on post-resection
-%   recordings
-%
-% - distribution of global connectivity values (per epoch) on pre-resection
-%   recordings
-%
-%  compute a reference threshold for global connectivity magnitude using post-resection values
-%  compute a reference threshold for global connectivity variation using post-resection values
+%  plot and save results:
 % 
+% 1) Main figure (figFname) showing fot each subject the comparision between the distribuion of global functional connectivity
+%    for the four condition: 
+%      - pre-resection
+%      - post-resection
+%      - virtual resection after partialization
+%      - naive virtual resection 
+%   
+% 2) Text file (resFname) summarizing: 
+%     - the number of subjects for whom it was not possible formulate a prediction
+%     - number of successful predictions for naive virtual resection
+%     - number of successful predictions for virtual resection after
+%       partialization
+%       
+% 3) text file (tabFname) witha table containing:
+%                - as variable names patients names for whom it was possible to make a prediction
+%                - as rows the three tested conditions for the patients for whom it was possible to formulate a prediction
+%                  (pre-resection vs post-resection, pre-resection vs naive virtual, pre-resection vs virtual with partialization )
+%                - as values the p-values of Kolmogorov-Smirnov test
+%
+%
+%
+%
 % INPUT
 %       fc_res    cell with the functional connectivity result struct for each
 %                 patient. Each functional connectivity result struct
