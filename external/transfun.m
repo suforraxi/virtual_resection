@@ -12,7 +12,7 @@
 %   M - masc for the transformed points
 % VERSION
 %   Stiliyan 25.11.2004
-
+% Copyright (C) 2020 Stiliyan Kalitzin
 function [S1,M] = transfun(S,g,L);
 S1=S*0;
 M=logical(S*0); 

@@ -1,4 +1,5 @@
 % S1 =  h2_partialize(S,IX,n);
+% Copyright (C) 2020 Stiliyan Kalitzin
 function S1 = h2_partialize(S,IX,n)
 if nargin<3
     n=0.1;

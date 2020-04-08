@@ -12,7 +12,7 @@
 %   M - masc for the transformed points
 % VERSION
 %   Stiliyan 05.12.2007
-
+% Copyright (C) 2020 Stiliyan Kalitzin
 function [S1,M] = transfun_i(S,g,L)
 n=size(L,1); 
 S1=S*0;

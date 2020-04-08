@@ -25,7 +25,7 @@
 %                      
 % VERSION:
 %  Stiliyan, 13.08.18
-
+%  Copyright (C) 2020 Stiliyan Kalitzin
 function [C,n,p]=h2_m(S1,S2,n,N)
 S1=reshape(S1,[1 numel(S1)]); 
 S2=reshape(S2,[1 numel(S2)]); 

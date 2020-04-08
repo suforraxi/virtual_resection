@@ -17,7 +17,7 @@
 %  L - 2D array with bin borders of S1; [L(:,1) L(:,2)]
 % VERSION:
 %  Stiliyan, 05.08.05
-
+% Copyright (C) 2020 Stiliyan Kalitzin
 function [C,g,N,D,L]=h2(S1,S2,n);
 S1=reshape(S1,[1 numel(S1)]); 
 S2=reshape(S2,[1 numel(S2)]); 

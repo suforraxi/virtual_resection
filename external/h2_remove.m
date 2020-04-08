@@ -10,7 +10,7 @@
 %    R2 - the cleaned S2 signal
 % VERSION:
 %    Stiliyan, 05.12.2007
-
+% Copyright (C) 2020 Stiliyan Kalitzin
 
 function R2 = h2_remove(S2,S1,n)
 if nargin<3 

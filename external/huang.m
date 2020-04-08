@@ -28,7 +28,7 @@
 %  interflat
 % VERSION:
 %  Stiliyan & George, 03.08.2017
-
+% Copyright (C) 2020 Stiliyan Kalitzin
 function [S1,N,D,F,P] = huang(S,N1,N2,method)
 if nargin<2
     N1=[]; 
