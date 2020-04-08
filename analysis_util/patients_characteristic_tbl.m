@@ -1,4 +1,4 @@
-% creating a summary table 
+% creating a summary table for patient info
 
 % name / age / gender / # electrodes / # resected electrodes / primary
 % pathology / 1y seizure outcome

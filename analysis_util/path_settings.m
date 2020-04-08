@@ -20,11 +20,10 @@
 %     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
 % git root
 git_root = '/home/matteo/Desktop/git_rep/';
 
-% functions to import BIDS structures for ioECoG  (https://github.com/suforraxi/ieeg_respect_bids)         
+% functions to import BIDS structures for ioECoG  (ithub.com/suforraxi/ieeg_respect_bids)         
 addpath(fullfile(git_root,'ieeg_respect_bids'))
 addpath(fullfile(git_root,'ieeg_respect_bids','external'))
 addpath(fullfile(git_root,'ieeg_respect_bids','importBIDS'))
@@ -40,17 +39,18 @@ addpath((fullfile(git_root,'fieldtrip','fieldtrip_private')));
 % json functions (https://github.com/fangq/jsonlab)
 addpath(fullfile(git_root,'jsonlab')) 
 
-% scorEpochs (https://github.com/suforraxi/scorepochs)
-addpath(fullfile(git_root,'scorepochs'))
 
 % virtual resection
 addpath(fullfile(git_root,'virtual_resection'))
 addpath(fullfile(git_root,'virtual_resection','import_trc'))
 addpath(fullfile(git_root,'virtual_resection','montage'))
-addpath(fullfile(git_root,'virtual_resection','testing'))
+%addpath(fullfile(git_root,'virtual_resection','testing'))
 addpath(fullfile(git_root,'virtual_resection','external'))
 
-% notBoxplot https://github.com/raacampbell/notBoxPlot
-addpath(fullfile(git_root,'notBoxPlot','code'))
+% add violin plot functions (https://github.com/bastibe/Violinplot-Matlab)
+addpath('/home/matteo/Desktop/git_rep/Violinplot-Matlab/')
+
+% add shaded error bar functions (https://github.com/raacampbell/shadedErrorBar)
+addpath('/home/matteo/Desktop/git_rep/shadedErrorBar/')
 
 

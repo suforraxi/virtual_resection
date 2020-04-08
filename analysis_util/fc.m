@@ -3,12 +3,15 @@
 %
 % INPUT 
 % x       - data matrix (channel X timesample)
-% fc_type - string one of the possible
-%          'corr'
-%          'coh'
+% fc_type - string one of the possible measures
+%          'corr'  - Pearson correlation (zero lag)
+%          'xcorr' - cross-correlation  (choose max value across delays)
+%          'coh'   - coherence (see spectral coherence from Analyzing Neural Time Series Data Mike X Cohen, MIT press)
+%          'h2'    - non-linear correlation (see Kalitzin 2007 IEEE Trans Biom Eng)
+%          'pli'   - phase lag index (see Stam 2007 Hum Brain Mapp)
 % OUTPUT 
 % 
-% C     - functional connectivity matrix (correlation) 
+% C     - functional connectivity matrix 
 %
 function C = fc(x,fc_type)
 
@@ -18,8 +21,7 @@ C   = zeros(nch,nch);
 switch fc_type
     case 'corr'
         C              = corr(x');
-        %C(1:nch+1:end) = 1;
-        %C              = diag(sum(C,2))-C;
+      
     case 'coh'
         % a matrix (channels X time)
     
@@ -40,7 +42,7 @@ switch fc_type
        
         C              = C + C';
         C(1:nch+1:end) = 1;
-        %C              = diag(sum(C,2))-C;
+       
 
     case 'xcorr'
         

@@ -1,4 +1,4 @@
-% Apply orthogonalization to  data
+% Apply non linear partialization to data
 %
 % INPUT
 % d      - fieldtrip data structure
