@@ -8,13 +8,15 @@ sitFName   = strcat(aux.subName,'_',aux.sesName,'_','task-acute_ieeg');
 
 
 
-L = 60; % last minute
+L = 5; % last minute
 [status,msg,cfg,data] = importBidsData(sitFolder);
 
 maxtime = max(cellfun(@length,data.time));
 
-if(status == 0 && maxtime > L*data.fsample )
-            % use the last minute
+%if(status == 0 && maxtime > L*data.fsample )
+if(status == 0  )
+
+    
             cfg         = [];
             cfg.trials  = 'all';
             cfg.length  = L; %seconds of new trials
@@ -22,14 +24,21 @@ if(status == 0 && maxtime > L*data.fsample )
 
             data = ft_redefinetrial(cfg,data);
 
-            cfgLastEp        = [];
-            ntrials          = size(data.trial,2);
-            cfgLastEp.trials = ntrials;
-            data             = ft_selectdata(cfgLastEp,data); 
+            %cfgLastEp        = [];
+            %ntrials          = size(data.trial,2);
+            %cfgLastEp.trials = ntrials;
+            %data             = ft_selectdata(cfgLastEp,data); 
 
             % apply montage 
 
-            m_data = apply_bipolar2D_montage(data);
+            %m_data = apply_bipolar2D_montage(data);
+
+            % avg montage
+            cfgM.reref       = 'yes';
+            cfgM.refmethod   = 'avg';
+            cfgM.implicitref = [];
+            cfgM.refchannel  = 'all';
+            m_data           = ft_preprocessing(cfgM,data);
 
             % remove artefacts
 

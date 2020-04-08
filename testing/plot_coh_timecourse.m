@@ -1,14 +1,12 @@
 function plot_coh_timecourse()
 
-inFolder = '/home/matteo/Desktop/virtual_resection/syn/h2_all_epochs/';
+inFolder  = '/home/matteo/Desktop/virtual_resection/syn/h2/';
+outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/reference_one_minute/';
 
 inFiles  = dir(fullfile(inFolder,'*.mat'));
 
 subjNames = unique(extractBetween({inFiles(:).name},5,12));
 
-%getCoh   = @(x) x.coh;
-%getV1Coh  = @(x) x.V1coh;
-%getV2Coh  = @(x) x.V2coh;
 
 coh_tc   = cell(1,numel(subjNames)); 
 for s = 1: numel(subjNames)
@@ -44,6 +42,7 @@ for s = 1: numel(subjNames)
                     coh_tc{s}.post_syn_v  = cellfun(@getfield,sit_res,repmat({'syn'},1,numel(sit_res)));
                  end
                   coh_tc{s}.Cpost       = cellfun(@getfield,sit_res,repmat({'C'},1,numel(sit_res)),'UniformOutput',false);
+                  coh_tc{s}.so          = sit_res{1}.so;
         end
         
         
@@ -57,15 +56,12 @@ for s = 1: numel(subjNames)
 end
 
 
-
-
-
 % plot synchronizability
 fig    = zeros(1,numel(coh_tc));
 
+% color order for the 
 co     = [1 0 0; 0 0 1; 0 0 0; 0 1 0 ; 1 1 0; 0 1 1;1 0 1];
 Lwidth = 1.5;
-
 
 % for i = 1 : numel(coh_tc)
 %    
@@ -200,7 +196,7 @@ Lwidth = 1.5;
 % global connectivity
 
 %plot_global(coh_tc,subjNames,Lwidth,co)
-plot_global_all_epochs(coh_tc,subjNames,Lwidth,co)
+plot_global_all_epochs(coh_tc,subjNames,outFolder)
 
 
 function plot_syn_epochs(coh_tc,subjNames,Lwidth,co)
@@ -236,7 +232,7 @@ for i = 1 : numel(coh_tc)
 end
 
 % save global functional connectivity
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects/';
+%outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_subjects/';
 if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
@@ -248,50 +244,84 @@ for i = 1 : numel(fig)
     close(fig(i))
 end
 
-function plot_global_all_epochs(coh_tc,subjNames,Lwidth,co)
 
-fig     = zeros(1,numel(coh_tc));
-nTrial  = numel(coh_tc{1}.Cpre);
+% plot violinplot for every subject
+% compute a reference threshold for global connectivity magnitude using post-resection values
+% compute a reference threshold for global connectivity variation using
+% post-resection values
+% 
 
+function plot_global_all_epochs(fc_res,subjNames,outFolder)
+
+nSubjs   = numel(fc_res);
 
 nr      = 4;
-fig     = figure;
-vari     = zeros(nr,numel(coh_tc));
-mu      = zeros(nr,numel(coh_tc));
-err     = zeros(nr,numel(coh_tc));
-h       = zeros(3,numel(coh_tc));
-p       = zeros(3,numel(coh_tc));
+nc      = 2;
 
-relErr = @(m,x,y) m(y,x);%@(m,x,y) abs((m(x)-m(y))/m(y));%abs((mean(x)-mean(y)));
-for i = 1 : numel(coh_tc)
-   
-    
-    
-    subplot(4,2,i)
-    %avg_fc  = zeros(nr,nTrial);
+fig     = figure;
+X_lim   = [0 5];
+Y_lim   = [0 0.45];
+
+alpha_level = 0.01;
+
+vari    = zeros(nr,numel(fc_res));
+mu      = zeros(nr,numel(fc_res));
+
+h       = zeros(3,numel(fc_res));
+p       = zeros(3,numel(fc_res));
+
+
+
+% compute reference threshold for global connectivity magnitude and global
+% connectivity variation 
+M   = zeros(1,nSubjs); % Magnitude
+V   = zeros(1,nSubjs); % Variation
+so  = cell(1,nSubjs);
+for s = 1 : nSubjs
   
-    pre_v  = cellfun(@get_Stats,coh_tc{i}.Cpre);
-    v1_v   = cellfun(@get_Stats,coh_tc{i}.C1);
-    v2_v   = cellfun(@get_Stats,coh_tc{i}.C2);
-    post_v = cellfun(@get_Stats,coh_tc{i}.Cpost);
+    post_v = cellfun(@get_Stats,fc_res{s}.Cpost);
     
-    mu(1,i)  = mean(pre_v);
-    mu(2,i)  = mean(v1_v);
-    mu(3,i)  = mean(v2_v);
-    mu(4,i)  = mean(post_v);
+    M(s)  = max(post_v);
+    V(s)  = std(post_v);
+    so(s) = fc_res{s}.so;
+end
+
+idx_bad_out = cellfun(@isempty,regexp(so,'1A\w*'));
+
+ref_mag  = max(M(~idx_bad_out));
+ref_vari = max(V(~idx_bad_out));
+
+answer_allowed = zeros(1,nSubjs);
+virtual1_works = zeros(1,nSubjs);
+virtual2_works = zeros(1,nSubjs);
+
+for s = 1 : nSubjs
+   
+   
+    subplot(nr,nc,s)
+  
+    pre_v  = cellfun(@get_Stats,fc_res{s}.Cpre);
+    v1_v   = cellfun(@get_Stats,fc_res{s}.C1);
+    v2_v   = cellfun(@get_Stats,fc_res{s}.C2);
+    post_v = cellfun(@get_Stats,fc_res{s}.Cpost);
+    
+    mu(1,s)  = mean(pre_v);
+    mu(2,s)  = mean(v1_v);
+    mu(3,s)  = mean(v2_v);
+    mu(4,s)  = mean(post_v);
     
     
-    vari(1,i)  = std(pre_v);
-    vari(2,i)  = std(v1_v);
-    vari(3,i)  = std(v2_v);
-    vari(4,i)  = std(post_v);
+    vari(1,s)  = std(pre_v);
+    vari(2,s)  = std(v1_v);
+    vari(3,s)  = std(v2_v);
+    vari(4,s)  = std(post_v);
     
     
     
     
-    [h(1,i),p(1,i)] = kstest2(pre_v,post_v,'Tail','smaller','Alpha',0.01);
-    [h(2,i),p(2,i)] = kstest2(v1_v,post_v,'Tail','unequal','Alpha',0.01);
-    [h(3,i),p(3,i)] = kstest2(v2_v,post_v,'Tail','unequal','Alpha',0.01);
+    [h(1,s),p(1,s)] = kstest2(pre_v,post_v,'Tail','smaller','Alpha',alpha_level);
+    [h(2,s),p(2,s)] = kstest2(pre_v,v1_v,'Tail','smaller','Alpha',alpha_level);
+    [h(3,s),p(3,s)] = kstest2(pre_v,v2_v,'Tail','smaller','Alpha',alpha_level);
     
     
     
@@ -301,40 +331,60 @@ for i = 1 : numel(coh_tc)
              ];
     
     violinplot(val,labels,'showMean',true);     
+    
     hold
-    line([0 4.5],[0.1 0.1],'LineStyle','--','Color','green') 
+    
+    ref_x  = 0:numel(unique(labels))+1;
+    ref_y  = repmat(ref_mag,1,numel(unique(labels))+2);
+    errBar = repmat(ref_vari,1,numel(unique(labels))+2);
+    shadedErrorBar(ref_x, ref_y,errBar, 'lineprops', '-g')
+    line([0 numel(unique(labels))+1],[ref_mag ref_mag],'LineStyle','--','color','k')
+    
     ylabel('Global Connectivity')
-    title(subjNames{i})
-    %ylim([0 0.45])
+    title(subjNames{s})
     
+    ylim(Y_lim)
+    set(gca,'XLim',X_lim)
     
-    
-    
+    if(any( pre_v > ref_mag+ref_vari ))
+        answer_allowed(s) = 1;
+        
+        if(h(2,s))
+            virtual1_works(s) = 1;
+        end
+        if(h(3,s))
+            virtual2_works(s) = 1;
+        end
+    end
 end
 
-(vari-repmat(vari(1,:),4,1))./repmat(vari(1,:),4,1)*100
-(mu-repmat(mu(1,:),4,1))./repmat(mu(1,:),4,1)*100
-cv = vari./mu
-(cv-repmat(cv(1,:),4,1))./repmat(cv(1,:),4,1)*100
+
+h(:,logical(answer_allowed))
+p(:,logical(answer_allowed))
+sprintf('successful prediction naive: %i / %i',sum(virtual1_works),sum(answer_allowed))
+sprintf('successful prediction partialization: %i / %i',sum(virtual2_works),sum(answer_allowed))
+sprintf('cannot answer : %i / %i',sum(~answer_allowed),numel(answer_allowed))
+
+
 
 
 % save global functional connectivity
-outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_epochs/';
+%outFolder = '/home/matteo/Desktop/virtual_resection/res_pic/all_epochs/';
 if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
 if(numel(fig) == 1)
         set(fig,'WindowState','fullscreen')
-        outfile = fullfile(outFolder,strcat('all_subjects','_',coh_tc{1}.fc_type,'_','global'));
+        outfile = fullfile(outFolder,strcat('all_subjects','_',fc_res{1}.fc_type,'_','global'));
         print(fig,outfile,'-djpeg');
         close(fig)
 else
-    for i = 1 : numel(fig)
+    for s = 1 : numel(fig)
 
-        set(fig(i),'WindowState','fullscreen')
-        outfile = fullfile(outFolder,strcat(coh_tc{i}.fname,'_','global'));
-        print(fig(i),outfile,'-djpeg');
-        close(fig(i))
+        set(fig(s),'WindowState','fullscreen')
+        outfile = fullfile(outFolder,strcat(fc_res{s}.fname,'_','global'));
+        print(fig(s),outfile,'-djpeg');
+        close(fig(s))
     end
 end
 

@@ -18,6 +18,7 @@ info_T.Properties.RowNames = info_T.subjID;
 
 subjName = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
 %subjName = {'RESP0381','RESP0451'};
+ subjName = {'RESP0591'};
   
 out            = [];
 cfg.bidsFolder = bidsFolder;
