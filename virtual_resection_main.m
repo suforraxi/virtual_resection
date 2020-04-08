@@ -1,4 +1,7 @@
-% load data
+%  Implementation of the virtual resection with intraoperative intracranial
+%  data. 
+%  
+%  see Demuru et al. doi: 
 
 function virtual_resection_main()
 
