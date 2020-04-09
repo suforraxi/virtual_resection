@@ -1,6 +1,15 @@
 %  Implementation of the virtual resection with intraoperative intracranial
 %  data. 
-%  
+%  Two types of virtual resection based on functional connectivity are implemented:
+%
+%   1) Naive virtual resection where resected nodes are removed from the connectivity 
+%      matrix (see Kini 2019 Brain) 
+%
+%   2) Virtual resection with partialization where common source influences 
+%      from resected nodes (signals from resected electrodes) are removed before 
+%      to compute functional connectivity  
+%
+%
 %  see Demuru et al. doi: 
 
 
