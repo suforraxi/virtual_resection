@@ -40,15 +40,22 @@ bidsFolder = '/home/matteo/Desktop/virtual_resection/sel_data/';
 outFolder  = '/home/matteo/Desktop/virtual_resection/commenting/';
 
 
+
 % subject information table (containing seizure outcome and other info)
 info_F = '/home/matteo/Desktop/virtual_resection/info/info.tsv';
 info_T = readtable(info_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
 info_T.Properties.RowNames = info_T.subjID;
+% subject and situations pre and post to use
+subjSit2use_F = '/home/matteo/Desktop/virtual_resection/info/situations2use.tsv';
+subjSit2use_T = readtable(subjSit2use_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
+subjSit2use_T.Properties.RowNames = subjSit2use_T.subjID;
+
 
 % select subjects
+subjName = subjSit2use_T.subjID;
 
 %subjName = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
-subjName = {'RESP0384'};
+%subjName = {'RESP0384'};
 
   
 out            = [];
@@ -84,7 +91,7 @@ for i = 1: numel(subjName)
     cfg.subjName        = subjName{i};
     % take the seizure outcome at 1 year
     cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
- 
+    cfg.sitNames        = subjSit2use_T{subjName{i},{'pre','post'}};
     switch cfg.fc_type
         case 'h2'
                 out = nonLinear_partialization(cfg);
@@ -121,6 +128,7 @@ end
 %               EnvType:    define how to compute the envelope ('filt_hilbert_env' using Hilbert transform)
 %               FConEnv:    flag to control if compute the functional connectity measure of raw signal or on the envelopes (yes/no)
 %               subjName:   selected coded subject name 'RESPXXXX' for whom computing the functional connectivity
+%               sitNames:   selected situations per subjects
 %               seizOut:    seizure outcome string {i.e. EngelClass_AED_InfoAboutMedication:'1A_AED_stop' }
 %
 % OUTPUT
@@ -292,6 +300,7 @@ if(cfg.pre || cfg.post) % pre or post situation
 %               EnvType:    define how to compute the envelope ('filt_hilbert_env' using Hilbert transform)
 %               FConEnv:    flag to control if compute the functional connectity measure of raw signal or on the envelopes (yes/no)
 %               subjName:   selected coded subject name 'RESPXXXX' for whom computing the functional connectivity
+%               sitNames:   selected situations per subjects
 %               seizOut:    seizure outcome string {i.e. EngelClass_AED_InfoAboutMedication:'1A_AED_stop' }
 %
 %
@@ -310,12 +319,22 @@ out = [];
  subjName   = cfg.subjName;
   
  sit             = dir(fullfile(bidsFolder,strcat('sub-',subjName),strcat('ses*')));    
- situationName   = cell(numel(sit),1);
+ situationName   = cell(numel(cfg.sitNames),1);
  
+ % filter selected situation 
+ k = 1;
  for i = 1 :numel(sit)
-     situationName{i} = replace(sit(i).name,'ses-','');
+     
+     c_situationName = replace(sit(i).name,'ses-','');
+    
+    if(any(strcmp(c_situationName,cfg.sitNames)))
+        situationName{k} = c_situationName;
+        k                = k+1;
+    end
+     
  end
 
+ 
  [pre,~,post] = find_pre_int_post(situationName);
  
   
