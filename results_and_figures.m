@@ -21,7 +21,7 @@
 function results_and_figures()
 
 % input folder of the results (see virtual_resection_main)
-inFolder  = '/home/matteo/Desktop/virtual_resection/syn/h2_all_epochs/';
+inFolder  = '/home/matteo/Desktop/virtual_resection/commenting/syn/h2/';
 % output folder where to save the figures and tables
 outFolder = '/home/matteo/Desktop/virtual_resection/commenting/';
 

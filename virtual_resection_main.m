@@ -35,24 +35,20 @@ function virtual_resection_main()
 path_settings();
 
 % BIDS input folder 
-bidsFolder = '/home/matteo/Desktop/virtual_resection/sel_data/';
+bidsFolder = '/home/matteo/Desktop/virtual_resection/data/';
 % output folder where to save results
 outFolder  = '/home/matteo/Desktop/virtual_resection/commenting/';
 
 
 
 % subject information table (containing seizure outcome and other info)
-info_F = '/home/matteo/Desktop/virtual_resection/info/info.tsv';
+info_F = './info/info_virtual_resection.tsv';
 info_T = readtable(info_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
 info_T.Properties.RowNames = info_T.subjID;
-% subject and situations pre and post to use
-subjSit2use_F = '/home/matteo/Desktop/virtual_resection/info/situations2use.tsv';
-subjSit2use_T = readtable(subjSit2use_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
-subjSit2use_T.Properties.RowNames = subjSit2use_T.subjID;
 
 
 % select subjects
-subjName = subjSit2use_T.subjID;
+subjName = info_T.subjID;
 
 %subjName = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
 %subjName = {'RESP0384'};
@@ -91,7 +87,7 @@ for i = 1: numel(subjName)
     cfg.subjName        = subjName{i};
     % take the seizure outcome at 1 year
     cfg.seizOut         = info_T{subjName{i},'description_sf_1y'};
-    cfg.sitNames        = subjSit2use_T{subjName{i},{'pre','post'}};
+    cfg.sitNames        = info_T{subjName{i},{'pre','post'}};
     switch cfg.fc_type
         case 'h2'
                 out = nonLinear_partialization(cfg);
