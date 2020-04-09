@@ -22,16 +22,18 @@
 
 function patients_characteristic_tbl()
 
-
+inResFolder  = '/home/matteo/Desktop/virtual_resection/commenting/syn/h2/';
 age_gender_F = '/home/matteo/Desktop/openclinica/TAB_age_gender_second_attempt_2019-10-28-095433974.tsv';
-info_F       = '/home/matteo/Desktop/virtual_resection/info/info.tsv';
+info_F       = './info/info_virtual_resection.tsv';
 
-outFile      = '/home/matteo/Desktop/virtual_resection/info/characteristic_table.txt';
-% subject of interest
-subj_OI      = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
+outFile      = '/home/matteo/Desktop/virtual_resection/commenting/characteristic_table.txt';
 
 age_gender_T = readtable(age_gender_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
 info_T       = readtable(info_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
+
+% subject of interest
+subj_OI      = info_T.subjID;% {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
+
 
 primary_path = {'High Grade Tumor (WHO III + IV)',...
                     'Low Grade Tumor (WHO I + II)',   ...
@@ -70,10 +72,10 @@ age_gender_T.Age =  newAge;
 
 characteristics_T = innerjoin(info_T,age_gender_T,'Keys','subjID');
 
-characteristics_T;
 
-
-infoRec_T = get_info_recordings();
+cfg.inFolder = inResFolder;
+cfg.subj_OI  = subj_OI;
+infoRec_T    = get_info_recordings(cfg);
 
 characteristics_T = innerjoin(characteristics_T,infoRec_T,'Keys','subjID');
 
@@ -88,7 +90,7 @@ for i = 1 : numel(primary_path)
     end
 end
 
-primary_path_str;
+
 
 final_T = [characteristics_T(:,[1 2 4:10]) cell2table(primary_path_str,'VariableNames',{'primary_pathology'}) ];
 
@@ -97,11 +99,11 @@ writetable(final_T,outFile,'FileType','text', 'Delimiter','tab')
 % extract information pre and post resection about:
 % number of epochs / number of channels / number of resected channels
 
-function infoRec_T =get_info_recordings()
+function infoRec_T = get_info_recordings(cfg)
 
 % folder with the 
-inFolder = '/home/matteo/Desktop/virtual_resection/coh/h2_all_epochs/';
-subj_OI  = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
+inFolder = cfg.inFolder;%'/home/matteo/Desktop/virtual_resection/coh/h2_all_epochs/';
+subj_OI  = cfg.subj_OI;%{'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
 varNames = {'n_ch_pre','n_RESch_pre','n_Ep_pre','n_ch_post','n_Ep_post'};
 
 m_info = zeros(numel(subj_OI),numel(varNames));
@@ -144,7 +146,7 @@ for s = 1 : numel(subj_OI)
 end
 
 infoRec_T = array2table(m_info,'VariableNames',varNames);
-infoRec_T = [cell2table(subj_OI','VariableNames',{'subjID'}) infoRec_T ];
+infoRec_T = [cell2table(subj_OI,'VariableNames',{'subjID'}) infoRec_T ];
 
 
 
