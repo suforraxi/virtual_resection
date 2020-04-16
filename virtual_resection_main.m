@@ -235,10 +235,10 @@ if(cfg.pre || cfg.post) % pre or post situation
                             m_data = apply_bipolar2D_montage(m_data);
                 end
                 % remove artefacts
-                res_elec      = get_resected_elec(bidsFolder,sitFName);
-                [ artefact_T] = get_metadata(bidsFolder,sitFName);
+                res_elec   = get_resected_elec(bidsFolder,sitFName);
+                artefact_T = get_metadata(bidsFolder,sitFName);
                 
-                cfgAnalysis.res_elec         = res_elec;
+                cfgAnalysis.res_elec = res_elec;
                
                if (cfg.lastMinute) 
                     
