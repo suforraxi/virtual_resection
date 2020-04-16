@@ -1,5 +1,4 @@
 % function to obtain metadata regarding the recordings
-% if a channel was resected or not during surgery
 % if a channel contains any artefact during the recordings
 % 
 % INPUT
