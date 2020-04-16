@@ -44,13 +44,13 @@ try
     hdrFile     = hdrFile(1).name;
     channelFile = dir(fullfile(inDir,'*channels.tsv'));
     channelFile = channelFile(1).name;
-    annotFile   = dir(fullfile(inDir,'*annotations.tsv'));
-    annotFile   = annotFile(1).name;
+    eventFile   = dir(fullfile(inDir,'*events.tsv'));
+    eventFile   = eventFile(1).name;
 
     
     cfg.datasetName = fullfile(inDir,hdrFile);
     cfg.channelFile = fullfile(inDir,channelFile);
-    cfg.annotFile   = fullfile(inDir,annotFile);
+    cfg.eventFile   = fullfile(inDir,eventFile);
     cfg.noArtefact  = 0;
 
     data = importSituation(cfg);

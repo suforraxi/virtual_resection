@@ -35,9 +35,9 @@ function virtual_resection_main()
 path_settings();
 
 % BIDS input folder 
-bidsFolder = '/home/matteo/Desktop/virtual_resection/data/';
+bidsFolder = '/home/matteo/Desktop/virtual_resection/BIDS_data/';
 % output folder where to save results
-outFolder  = '/home/matteo/Desktop/virtual_resection/commenting/';
+outFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS/';
 
 
 
@@ -51,7 +51,7 @@ info_T.Properties.RowNames = info_T.subjID;
 subjName = info_T.subjID;
 
 %subjName = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
-%subjName = {'RESP0384'};
+%subjName = {'RESP0381','RESP0384'};
 
   
 out            = [];
@@ -149,7 +149,7 @@ end
 %                     pre:      integer defining if the situation was pre-resection or not(1/0)
 %                     post:     FConEnv: 'yes'
 %                     montage:  reference montage applied to the data ('avg' for average /'bipolar' for bipolar in two direction)  
-%                     res_ch:   cell array with the name of resected channels
+%                     res_elec: ell array with the name of resected electrode
 %           
 %
 %       m_data      - fieldtrip data structure after pre-processing
@@ -235,10 +235,10 @@ if(cfg.pre || cfg.post) % pre or post situation
                             m_data = apply_bipolar2D_montage(m_data);
                 end
                 % remove artefacts
-
-                [ res_channel, artefact_T] = get_metadata(bidsFolder,sitFName);
+                res_elec      = get_resected_elec(bidsFolder,sitFName);
+                [ artefact_T] = get_metadata(bidsFolder,sitFName);
                 
-                cfgAnalysis.res_ch         = res_channel;
+                cfgAnalysis.res_elec         = res_elec;
                
                if (cfg.lastMinute) 
                     
@@ -374,7 +374,7 @@ out = [];
 %                     pre:      integer defining if the situation was pre-resection or not(1/0)
 %                     post:     FConEnv: 'yes'
 %                     montage:  reference montage applied to the data ('avg' for average /'bipolar' for bipolar in two direction)  
-%                     res_ch:   cell array with the name of resected channels
+%                     res_elec:   cell array with the name of resected electrodes
 %           
 %
 %       m_data - fieldtrip data structure after pre-processing
@@ -406,7 +406,7 @@ function o = compute_fc_h2(cfg,m_data)
 
 
 nTrial      = numel(m_data.trial);
-res_channel = cfg.res_ch;
+res_elec    = cfg.res_elec;
 fc_type     = cfg.fc_type;
 pre         = cfg.pre;
 post        = cfg.post;
@@ -434,18 +434,19 @@ for t = 1 : nTrial
     o{t}.montage  = cfg.montage;
 
 end
+
 for t = 1 : nTrial % virtual resection
     if(pre)
         o{t}.sitType = 'Pre';
 
          % virtual resection
-        if(numel(res_channel) > 0) % there are resected channels
+        if(numel(res_elec) > 0) % there are resected channels
 
             % virtual resection naive
             idx2rm = zeros(numel(m_data.label),1);
             % find indexes to be resected
-            for r = 1 :numel(res_channel)
-                 mono_ch = res_channel{r};
+            for r = 1 :numel(res_elec)
+                 mono_ch = res_elec{r};
                  idx2rm  = idx2rm | (~cellfun(@isempty,regexp(m_data.label,mono_ch)));
             end
             C           = o{t}.C;
@@ -453,7 +454,7 @@ for t = 1 : nTrial % virtual resection
             o{t}.C1     = C1;
         
             % virtual resection with partialization
-            m_data   = removeNoNLinear_ch(m_data,idx2rm); 
+            m_data   = removeNoNLinear_ch(m_data,idx2rm); % TO FIX over computing inside the function
             mEnv     = get_Envelope(cfg,m_data.trial{t});
             C2       = fc(mEnv,fc_type);
             o{t}.C2  = C2;
