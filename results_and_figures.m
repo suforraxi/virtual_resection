@@ -21,9 +21,9 @@
 function results_and_figures()
 
 % input folder of the results (see virtual_resection_main)
-inFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS/syn/h2/';
+inFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS_sec/syn/h2/';
 % output folder where to save the figures and tables
-outFolder = '/home/matteo/Desktop/virtual_resection/newBIDS/';
+outFolder = '/home/matteo/Desktop/virtual_resection/newBIDS_sec/';
 
 % figure Name 
 figFname = 'all_epochs';

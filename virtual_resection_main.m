@@ -35,9 +35,9 @@ function virtual_resection_main()
 path_settings();
 
 % BIDS input folder 
-bidsFolder = '/home/matteo/Desktop/virtual_resection/BIDS_data/';
+bidsFolder = '/home/matteo/Desktop/new_BIDS_import/virtual_resection/';
 % output folder where to save results
-outFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS/';
+outFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS_sec/';
 
 
 

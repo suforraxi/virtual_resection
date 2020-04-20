@@ -4,7 +4,7 @@ trc_input_dir = '/home/matteo/Desktop/virtual_resection/sel_TRC/';
 trcFiles      = dir(fullfile(trc_input_dir,'*.TRC'));
 
 cfg          = [];
-cfg.proj_dir = '/home/matteo/Desktop/virtual_resection/BIDS_data/';            % folder to store bids files
+cfg.proj_dir = '/home/matteo/Desktop/new_BIDS_import/virtual_resection/';  % folder to store bids files
 
 
 for i = 1 : numel(trcFiles)
