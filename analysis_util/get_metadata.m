@@ -10,8 +10,8 @@
 % artefact_T  - table with the following variables
 %               
 %               type    name of the artefact (we have just generic artefact called 'artefact')        
-%               start   sample time of the original data when the artefact starts        
-%               stop    sample time of the original data when the artefact ends
+%               start   time of the original data when the artefact starts (seconds)        
+%               stop    time of the original data when the artefact ends (seconds)
 %               channel channel name where the artefact was found
 
 %     Copyright (C) 2020 Matteo Demuru
