@@ -1,10 +1,12 @@
 
 % input folder with the trc
-trc_input_dir = '/home/matteo/Desktop/virtual_resection/sel_TRC/'; 
+trc_input_dir = '/home/matteo/Desktop/virtual_resection/sel_TRC/';
+trc_input_dir = '/home/matteo/Desktop/new_BIDS_import/trc/'; 
 trcFiles      = dir(fullfile(trc_input_dir,'*.TRC'));
 
 cfg          = [];
 cfg.proj_dir = '/home/matteo/Desktop/new_BIDS_import/virtual_resection/';  % folder to store bids files
+cfg.proj_dir = '/home/matteo/Desktop/new_BIDS_import/fix/';  % folder to store bids files
 
 
 for i = 1 : numel(trcFiles)
