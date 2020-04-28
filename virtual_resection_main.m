@@ -35,9 +35,9 @@ function virtual_resection_main()
 path_settings();
 
 % BIDS input folder 
-bidsFolder = '/home/matteo/Desktop/new_BIDS_import/virtual_resection/';
+bidsFolder = '/Fridge/acute_ECoG/RESPect_bids/bids_acute/';
 % output folder where to save results
-outFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS_sec/';
+outFolder  = '/home/matteo/Desktop/virtual_resection/results/all_epochs/';
 
 
 
@@ -60,7 +60,7 @@ cfg.bidsFolder = bidsFolder;
 cfg.fc_type         = 'h2';  % functional connectivity measure
 cfg.montage         = 'avg'; % montage to apply
     
-cfg.lastMinute      = 1;     % flag to control the if using the last minute or the whole recordings
+cfg.lastMinute      = 0;     % flag to control the if using the last minute or the whole recordings
 cfg.L               = 60;    % last minute
 cfg.overlap         = 0;     % no overlapping 
 
