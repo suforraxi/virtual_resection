@@ -456,18 +456,34 @@ if(~exist(outFolder,'dir'))
     mkdir(outFolder)
 end
 
+% all 
 
 cfgP           = [];
 cfgP.X_lim     = [0 4.5];
 cfgP.Y_lim     = [0 0.5];
 cfgP.nr        = 3;
 cfgP.nc        = 4;
-cfgP.subjNames = subjNames;
 cfgP.ref_mag   = ref_mag;
 cfgP.ref_vari  = ref_vari; 
+cfgP.subjNames = subjNames;
+cfgP.fc_res    = fc_res;
 
-fig = plot_fig(cfgP,fc_res);
+fig = plot_fig(cfgP);
 
+% applicability 
+cfgP.subjNames = subjNames(logical(answer_allowed));
+cfgP.fc_res    = fc_res(logical(answer_allowed));
+cfgP.nr        = 2;
+cfgP.nc        = 4;
+fig(2) = plot_fig(cfgP);
+
+% not applicability
+cfgP.nr        = 2;
+cfgP.nc        = 4;
+cfgP.subjNames = subjNames(logical(~answer_allowed));
+cfgP.fc_res    = fc_res(logical(~answer_allowed));
+
+fig(3) = plot_fig(cfgP);
 
 if(numel(fig) == 1)
         set(fig,'WindowState','fullscreen')
@@ -478,7 +494,7 @@ else
     for s = 1 : numel(fig)
 
         set(fig(s),'WindowState','fullscreen')
-        outfile = fullfile(outFolder,strcat(fc_res{s}.fname,'_','global'));
+        outfile = fullfile(outFolder,strcat('fig','_',num2str(s)));
         print(fig(s),outfile,'-djpeg');
         close(fig(s))
     end
@@ -487,18 +503,20 @@ end
 
 
 
-function f = plot_fig(cfg,fc_res)
+function f = plot_fig(cfg)
+   
+   
+   subjNames = cfg.subjNames;
+   fc_res    = cfg.fc_res;
+   X_lim     = cfg.X_lim;
+   Y_lim     = cfg.Y_lim; 
+   nr        = cfg.nr;
+   nc        = cfg.nc; 
+   ref_mag   = cfg.ref_mag;
+   ref_vari  = cfg.ref_vari;
    
    f         = figure;
    nSubjs    = numel(fc_res);  
-   subjNames = cfg.subjNames;
-   
-   X_lim    = cfg.X_lim;
-   Y_lim    = cfg.Y_lim; 
-   nr       = cfg.nr;
-   nc       = cfg.nc; 
-   ref_mag  = cfg.ref_mag;
-   ref_vari = cfg.ref_vari;
    
    
    for s = 1 : nSubjs 
