@@ -21,9 +21,9 @@
 function results_and_figures()
 
 % input folder of the results (see virtual_resection_main)
-inFolder  = '/home/matteo/Desktop/virtual_resection/newBIDS_sec/syn/h2/';
+inFolder  = './output/syn/h2/';
 % output folder where to save the figures and tables
-outFolder = '/home/matteo/Desktop/virtual_resection/newBIDS_sec/';
+outFolder = './output/';
 
 % figure Name 
 figFname = 'all_epochs';
@@ -70,9 +70,19 @@ for s = 1: numel(subjNames)
     end
 end
 
-plot_global_all_epochs(fc_res,subjNames,outFolder,figFname,resFname,tabFname)
 
-% 
+
+cfg.fc_res        = fc_res;
+cfg.subjNames     = subjNames;
+cfg.outFolder     = outFolder;
+cfg.thresoldType  = 'prc';
+cfg.prctile       = 95;
+cfg.alpha_level   = 0.05;
+cfg.tabFname      = 'result_pval.tsv';
+cfg.resFname      = 'summary_res.tsv';
+%plot_global_all_epochs(fc_res,subjNames,outFolder,figFname,resFname,tabFname)
+plot_global_fc(cfg)
+
 %  plot and save results:
 % 
 % 1) Main figure (figFname) showing fot each subject the comparision between the distribuion of global functional connectivity
@@ -140,7 +150,7 @@ function plot_global_all_epochs(fc_res,subjNames,outFolder,figFname,resFname,tab
 nSubjs   = numel(fc_res);
 
 nr      = 4;
-nc      = 2;
+nc      = 3;
 
 fig     = figure;
 X_lim   = [0 5];
@@ -301,6 +311,228 @@ else
 end
 
 
+
+
+function plot_global_fc(cfg)
+
+
+fc_res      = cfg.fc_res;
+subjNames   = cfg.subjNames;
+outFolder   = cfg.outFolder;
+alpha_level = cfg.alpha_level; % alpha level for Kolmogorov-Sminrnov test
+tabFname    = cfg.tabFname;
+resFname    = cfg.resFname;
+nSubjs   = numel(fc_res);
+
+
+% compute reference threshold for global connectivity magnitude and global
+% connectivity variation 
+M   = zeros(1,nSubjs); % Magnitude
+V   = zeros(1,nSubjs); % Variation
+so  = cellfun(@(x) x.so,fc_res);
+
+% indexes of bad seizure outcome patients (i.e. > Engel 1A )
+idx_bad_out = cellfun(@isempty,regexp(so,'1A\w*'));
+
+ref_mag  = 0;
+ref_vari = 0;
+
+switch cfg.thresoldType 
+    case 'max'
+        for s = 1 : nSubjs
+  
+            post_v = cellfun(@get_Stats,fc_res{s}.Cpost);
+    
+            M(s)  = max(post_v);
+            V(s)  = std(post_v);
+            so(s) = fc_res{s}.so;
+        end
+
+        ref_mag  = max(M(~idx_bad_out));
+        ref_vari = max(V(~idx_bad_out));
+    case 'prc'
+        post_v = [];
+        
+        for s = 1 : nSubjs
+            if(contains(fc_res{s}.so,'1A_AED'))
+                post_v = [ post_v cellfun(@get_Stats,fc_res{s}.Cpost)];
+            end
+        end
+        
+        ref_mag = prctile(post_v,cfg.prctile);
+end
+
+
+% indexes of subject for whom it is possible to formulate a prediction
+answer_allowed   = zeros(1,nSubjs);
+estimation_fc_v1 = zeros(1,nSubjs);
+estimation_fc_v2 = zeros(1,nSubjs);
+
+% matrixes to keep track of the Kolmogorov-Smirnov test
+h       = -1*ones(8,numel(fc_res));
+p       = -1*ones(8,numel(fc_res));
+
+for s = 1 : nSubjs
+   
+    pre_v  = cellfun(@get_Stats,fc_res{s}.Cpre); % pre-resection
+    v1_v   = cellfun(@get_Stats,fc_res{s}.C1);   % naive virtual resection
+    v2_v   = cellfun(@get_Stats,fc_res{s}.C2);   % virtual resection with partialization
+    post_v = cellfun(@get_Stats,fc_res{s}.Cpost); % post-resection
+    
+   
+    [h(1,s),p(1,s)] = kstest2(v1_v,post_v,'Tail','unequal','Alpha',alpha_level);
+   
+    [h(2,s),p(2,s)] = kstest2(v2_v,post_v,'Tail','unequal','Alpha',alpha_level);
+  
+   
+    
+    if(h(1,s) == 0 )
+        estimation_fc_v1(s) = 1;
+    end 
+    if(h(2,s) == 0)
+        estimation_fc_v2(s) = 1;
+    end 
+    
+    if(any( pre_v > ref_mag+ref_vari )) % any value bigger than the reference interval
+        answer_allowed(s) = 1;
+         
+        if(contains(fc_res{s}.so,'1A_AED'))
+            [h(3,s),p(3,s)] = kstest2(pre_v,post_v,'Tail','smaller','Alpha',alpha_level);
+
+            [h(4,s),p(4,s)] = kstest2(pre_v,v1_v,'Tail','smaller','Alpha',alpha_level);
+
+            [h(5,s),p(5,s)] = kstest2(pre_v,v2_v,'Tail','smaller','Alpha',alpha_level);
+
+        else
+            [h(6,s),p(6,s)] = kstest2(pre_v,post_v,'Tail','larger','Alpha',alpha_level);
+
+            [h(7,s),p(7,s)] = kstest2(pre_v,v1_v,'Tail','larger','Alpha',alpha_level);
+
+            [h(8,s),p(8,s)] = kstest2(pre_v,v2_v,'Tail','larger','Alpha',alpha_level);
+        end
+        
+      
+    end
+end
+
+
+
+% save kstest p-value table
+res_tbl = array2table(round(p,5),...
+                      'VariableNames',subjNames,...
+                       'RowNames',{'VRnaive_vs_post',...
+                                   'VRpartialization_vs_post',...
+                                   'pre vs_post_good',...
+                                   'naive_vs_post_good',...
+                                   'partialization_vs_post_good',...
+                                   'pre vs_post_bad',...
+                                   'naive_vs_post_bad',...
+                                   'partialization_vs_post_bad'...
+                                    ...
+                                   });
+
+writetable(res_tbl,fullfile(outFolder,tabFname),'FileType','text','Delimiter','tab','WriteRowNames',1);
+
+fid = fopen(fullfile(outFolder,resFname),'w');
+
+idx_good = ~idx_bad_out;
+
+fprintf(fid,'successful estimation fc naive: %i / %i\n',sum(estimation_fc_v1),nSubjs);
+fprintf(fid,'successful estimation fc partialization: %i / %i\n',sum(estimation_fc_v2),nSubjs);
+fprintf(fid,'good outcome : %i / %i bad outcome  : %i / %i\n',sum(idx_good),nSubjs,sum(idx_bad_out),nSubjs);
+fprintf(fid,'applicability  : %i / %i not applicability  : %i / %i\n',sum(answer_allowed),nSubjs,sum(~answer_allowed),nSubjs);
+fprintf(fid,'pre > post (good): %i / %i\n',sum( h(3,answer_allowed & idx_good) == 1),sum(answer_allowed & idx_good));
+fprintf(fid,'pre > naive (good): %i / %i\n',sum(h(4,answer_allowed & idx_good) == 1),sum(answer_allowed & idx_good));
+fprintf(fid,'pre > partialization (good): %i / %i\n',sum(h(5,answer_allowed & idx_good) == 1),sum(answer_allowed & idx_good));
+fprintf(fid,'pre < post (bad): %i / %i\n',sum(h(6,answer_allowed & idx_bad_out) == 1),sum(answer_allowed & idx_bad_out));
+fprintf(fid,'pre < naive (bad): %i / %i\n',sum(h(7,answer_allowed & idx_bad_out) == 1),sum(answer_allowed & idx_bad_out));
+fprintf(fid,'pre < partialization (bad): %i / %i\n',sum(h(8,answer_allowed & idx_bad_out) ==1 ),sum(answer_allowed & idx_bad_out));
+
+
+fclose(fid);
+
+
+if(~exist(outFolder,'dir'))
+    mkdir(outFolder)
+end
+
+
+cfgP           = [];
+cfgP.X_lim     = [0 4.5];
+cfgP.Y_lim     = [0 0.5];
+cfgP.nr        = 3;
+cfgP.nc        = 4;
+cfgP.subjNames = subjNames;
+cfgP.ref_mag   = ref_mag;
+cfgP.ref_vari  = ref_vari; 
+
+fig = plot_fig(cfgP,fc_res);
+
+
+if(numel(fig) == 1)
+        set(fig,'WindowState','fullscreen')
+        outfile = fullfile(outFolder,strcat('all_subjects','_',fc_res{1}.fc_type,'_','global'));
+        print(fig,outfile,'-djpeg');
+        close(fig)
+else
+    for s = 1 : numel(fig)
+
+        set(fig(s),'WindowState','fullscreen')
+        outfile = fullfile(outFolder,strcat(fc_res{s}.fname,'_','global'));
+        print(fig(s),outfile,'-djpeg');
+        close(fig(s))
+    end
+end
+
+
+
+
+function f = plot_fig(cfg,fc_res)
+   
+   f         = figure;
+   nSubjs    = numel(fc_res);  
+   subjNames = cfg.subjNames;
+   
+   X_lim    = cfg.X_lim;
+   Y_lim    = cfg.Y_lim; 
+   nr       = cfg.nr;
+   nc       = cfg.nc; 
+   ref_mag  = cfg.ref_mag;
+   ref_vari = cfg.ref_vari;
+   
+   
+   for s = 1 : nSubjs 
+    pre_v  = cellfun(@get_Stats,fc_res{s}.Cpre); % pre-resection
+    v1_v   = cellfun(@get_Stats,fc_res{s}.C1);   % naive virtual resection
+    v2_v   = cellfun(@get_Stats,fc_res{s}.C2);   % virtual resection with partialization
+    post_v = cellfun(@get_Stats,fc_res{s}.Cpost); % post-resection
+
+    subplot(nr,nc,s)
+
+
+    val    = [pre_v , post_v, v1_v, v2_v];
+    labels = [repmat({'3) pre'},1,numel(pre_v)) , repmat({'4) post'},1,numel(post_v)), ...
+               repmat({'1) VR_{Naive}'},1,numel(v1_v)) , repmat({'2) VR_{partialization}'},1,numel(v2_v)), ...
+             ];
+
+    violinplot(val,labels,'showMean',true);     
+    xtickangle(45) 
+    hold
+
+    ref_x  = 0:numel(unique(labels))+1;
+    ref_y  = repmat(ref_mag,1,numel(unique(labels))+2);
+    errBar = repmat(ref_vari,1,numel(unique(labels))+2);
+
+    shadedErrorBar(ref_x, ref_y,errBar, 'lineprops', '-g')
+
+    line([0 numel(unique(labels))+1],[ref_mag ref_mag],'LineStyle','--','color','k')
+
+    ylabel('Global Connectivity')
+    title(subjNames{s})
+
+    %ylim(Y_lim)
+    set(gca,'XLim',X_lim)
+   end
 
 function [avg_fc]= get_Stats(m)
 
