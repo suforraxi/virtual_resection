@@ -37,7 +37,7 @@ path_settings();
 % BIDS input folder 
 bidsFolder = '/Fridge/acute_ECoG/RESPect_bids/bids_acute/';
 % output folder where to save results
-outFolder  = '/home/matteo/Desktop/virtual_resection/results/all_epochs/';
+outFolder  = './output/';
 
 
 
@@ -50,9 +50,6 @@ info_T.Properties.RowNames = info_T.subjID;
 % select subjects
 subjName = info_T.subjID;
 
-%subjName = {'RESP0381','RESP0384','RESP0396','RESP0428','RESP0465','RESP0586','RESP0619','RESP0659'};
-%subjName = {'RESP0381','RESP0384'};
-
   
 out            = [];
 cfg.bidsFolder = bidsFolder;
@@ -61,7 +58,7 @@ cfg.fc_type         = 'h2';  % functional connectivity measure
 cfg.montage         = 'avg'; % montage to apply
     
 cfg.lastMinute      = 0;     % flag to control the if using the last minute or the whole recordings
-cfg.L               = 60;    % last minute
+cfg.L               = 25;    % last minute
 cfg.overlap         = 0;     % no overlapping 
 
 cfg.Tlength         = 5;     % seconds of new trials
