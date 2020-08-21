@@ -54,8 +54,9 @@ sfreq            = tsv_channels.sampling_frequency(1);
 tsv_annots       = readtable(eventsFile, 'Delimiter', 'tab', 'FileType', 'text', 'ReadVariableNames', true);
 
 % convert from seconds to samples
-tsv_annots.start = ceil(tsv_annots.start * sfreq);
-tsv_annots.stop  = ceil(tsv_annots.stop * sfreq);
+%tsv_annots.start = ceil(tsv_annots.start * sfreq);
+%tsv_annots.stop  = ceil(tsv_annots.stop * sfreq);
+
 
 idx_artefacts    = strcmp(tsv_annots.type,'artefact');
 

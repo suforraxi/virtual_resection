@@ -44,9 +44,9 @@ idx_art_trial = zeros(1,size(s,1));
 for i = 1 : nArtefacts
     for e = 1 : size(s,1)
 
-        b_art   = artefact_T.start(i);
-        end_art = artefact_T.stop(i);
-        art_ch  = artefact_T.channel{i};
+        b_art   = artefact_T.sample_start(i);
+        end_art = artefact_T.sample_stop(i);
+        art_ch  = artefact_T.electrode_involved{i};
 
         if( ~( (s(e,1) > b_art && s(1)> end_art) || ( s(e,end) < b_art && s(e,end) < end_art) ) )
             if ( s(e,1) > b_art && s(e,end) > end_art )
