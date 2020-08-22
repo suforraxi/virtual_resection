@@ -39,17 +39,18 @@ eventsFile        = fullfile(dataDir,...
                      subFolder{1},...
                      subFolder{2},...
                      'ieeg',...
-                      strcat(fileName,'_events.tsv'));
+                     strcat(subFolder{1},'_',subFolder{2},'_',subFolder{3},'_events.tsv'));
+                 
 channelsFile      = fullfile(dataDir,...
                      subFolder{1},...
                      subFolder{2},...
                      'ieeg',...
-                      strcat(fileName,'_channels.tsv'));
+                     strcat(subFolder{1},'_',subFolder{2},'_',subFolder{3},'_channels.tsv'));
 
 
 tsv_channels     = readtable(channelsFile, 'Delimiter', 'tab', 'FileType', 'text', 'ReadVariableNames', true);              
 
-sfreq            = tsv_channels.sampling_frequency(1);                  
+%sfreq            = tsv_channels.sampling_frequency(1);                  
 
 tsv_annots       = readtable(eventsFile, 'Delimiter', 'tab', 'FileType', 'text', 'ReadVariableNames', true);
 
@@ -58,7 +59,7 @@ tsv_annots       = readtable(eventsFile, 'Delimiter', 'tab', 'FileType', 'text',
 %tsv_annots.stop  = ceil(tsv_annots.stop * sfreq);
 
 
-idx_artefacts    = strcmp(tsv_annots.type,'artefact');
+idx_artefacts    = strcmp(tsv_annots.trial_type,'artefact');
 
 if(~isempty(idx_artefacts))
     artefact_T        = tsv_annots(idx_artefacts,:);
