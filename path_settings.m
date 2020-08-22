@@ -21,7 +21,7 @@
 
 
 % git root
-git_root = '/home/matteo/Desktop/git_rep/';
+git_root = '/Users/matte/Desktop/git_rep/';
 
 % functions to import BIDS structures for ioECoG  (ithub.com/suforraxi/ieeg_respect_bids)         
 addpath(fullfile(git_root,'ieeg_respect_bids'))
@@ -48,9 +48,9 @@ addpath(fullfile(git_root,'virtual_resection','analysis_util'))
 addpath(fullfile(git_root,'virtual_resection','external'))
 
 % add violin plot functions (https://github.com/bastibe/Violinplot-Matlab)
-addpath('/home/matteo/Desktop/git_rep/Violinplot-Matlab/')
+addpath('/Users/matte/Desktop/git_rep/Violinplot-Matlab/')
 
 % add shaded error bar functions (https://github.com/raacampbell/shadedErrorBar)
-addpath('/home/matteo/Desktop/git_rep/shadedErrorBar/')
+addpath('/Users/matte/Desktop/git_rep/shadedErrorBar/')
 
 

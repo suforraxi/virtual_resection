@@ -35,7 +35,7 @@ function virtual_resection_main()
 path_settings();
 
 % BIDS input folder 
-bidsFolder = '/Fridge/acute_ECoG/RESPect_bids/bids_acute/';
+bidsFolder = '/Users/matte/Desktop/git_rep/bids_4_sharing_acute/output/virtual_resection_data/data/';
 % output folder where to save results
 outFolder  = './output/';
 
