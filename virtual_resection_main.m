@@ -29,20 +29,20 @@
 %     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-function virtual_resection_main()
+function virtual_resection_main(cfg_main)
 
 % add dependecies
 path_settings();
 
 % BIDS input folder 
-bidsFolder = '/Users/matte/Desktop/git_rep/bids_4_sharing_acute/output/virtual_resection_data/data/';
+%bidsFolder = '/Users/matte/Desktop/git_rep/bids_4_sharing_acute/output/virtual_resection_data/data/';
 % output folder where to save results
-outFolder  = './output/';
+outFolder  = cfg_main.outFolder;
 
 
 
 % subject information table (containing seizure outcome and other info)
-info_F = './info/info_virtual_resection.tsv';
+info_F = cfg_main.info_F;%'./info/info_virtual_resection.tsv';
 info_T = readtable(info_F,'FileType','text','Delimiter','tab','ReadVariableNames',1);
 info_T.Properties.RowNames = info_T.subjID;
 
@@ -52,26 +52,26 @@ subjName = info_T.subjID;
 
   
 out            = [];
-cfg.bidsFolder = bidsFolder;
+cfg.bidsFolder = cfg_main.bidsFolder;
 
-cfg.fc_type         = 'h2';  % functional connectivity measure
-cfg.montage         = 'avg'; % montage to apply
+cfg.fc_type         = cfg_main.fc_type;  % functional connectivity measure
+cfg.montage         = cfg_main.montage; % montage to apply
     
-cfg.lastMinute      = 0;     % flag to control the if using the last minute or the whole recordings
-cfg.L               = 25;    % last minute
-cfg.overlap         = 0;     % no overlapping 
+cfg.lastMinute      = cfg_main.lastMinute ;     % flag to control the if using the last minute or the whole recordings
+cfg.L               = cfg_main.L;    % last minute
+cfg.overlap         = cfg_main.overlap;     % no overlapping 
 
-cfg.Tlength         = 5;     % seconds of new trials
-cfg.Toverlap        = 0;     % no overlapping between the epochs
+cfg.Tlength         = cfg_main.Tlength ;     % seconds of new trials
+cfg.Toverlap        = cfg_main.Toverlap;     % no overlapping between the epochs
 
-cfg.notch           = [50 100 150]; % notch filtering 
-cfg.bpfreq          = [5  150];     % frequency interval of interest 
+cfg.notch           = cfg_main.notch; % notch filtering 
+cfg.bpfreq          = cfg_main.bpfreq ;     % frequency interval of interest 
 
-cfg.notchBool       = 'yes';
-cfg.bpBool          = 'yes';
+cfg.notchBool       = cfg_main.notchBool;
+cfg.bpBool          = cfg_main.bpBool ;
 
-cfg.EnvType         = 'filt_hilbert_env'; % compute the envelope using hilbert
-cfg.FConEnv         = 'yes';              % flag to control if using envelopes of the signal or raw signal
+cfg.EnvType         = cfg_main.EnvType ; % compute the envelope using hilbert
+cfg.FConEnv         = cfg_main.FConEnv;              % flag to control if using envelopes of the signal or raw signal
 
 outFolder = fullfile(outFolder,'syn',cfg.fc_type);
     

@@ -21,9 +21,9 @@
 function results_and_figures()
 
 % input folder of the results (see virtual_resection_main)
-inFolder  = './output/syn/h2/';
+inFolder  = './output/broadband/syn/h2/';%'./output/bands_analysis/alpha_theta/syn/h2/';%'./output/syn/h2/'
 % output folder where to save the figures and tables
-outFolder = './output/';
+outFolder = './output/broadband/';%'./output/bands_analysis/alpha_theta/';%'./output/';
 
 % figure Name 
 figFname = 'all_epochs';
@@ -82,6 +82,14 @@ cfg.tabFname      = 'result_pval.tsv';
 cfg.resFname      = 'summary_res.tsv';
 %plot_global_all_epochs(fc_res,subjNames,outFolder,figFname,resFname,tabFname)
 plot_global_fc(cfg)
+
+
+% group effect pre-resection vs post-resection
+f = group_effect_pre_vs_post(fc_res);
+set(f,'WindowState','fullscreen')
+outfile = fullfile(outFolder,'group_level_pre_vs_post');
+print(f,outfile,'-djpeg');
+close(f)
 
 %  plot and save results:
 % 
@@ -473,17 +481,18 @@ fig = plot_fig(cfgP);
 % applicability 
 cfgP.subjNames = subjNames(logical(answer_allowed));
 cfgP.fc_res    = fc_res(logical(answer_allowed));
-cfgP.nr        = 2;
+cfgP.nr        = 3;
 cfgP.nc        = 4;
 fig(2) = plot_fig(cfgP);
 
 % not applicability
-cfgP.nr        = 2;
+cfgP.nr        = 3;
 cfgP.nc        = 4;
 cfgP.subjNames = subjNames(logical(~answer_allowed));
 cfgP.fc_res    = fc_res(logical(~answer_allowed));
 
 fig(3) = plot_fig(cfgP);
+
 
 if(numel(fig) == 1)
         set(fig,'WindowState','fullscreen')
@@ -561,10 +570,38 @@ function [avg_fc]= get_Stats(m)
         m(1:length(m)+1:end)   = 0;
         
         avg_fc = get_Gfc(m); 
+     
         
-       
-       
-        
-        
-        
+ function f = group_effect_pre_vs_post(fc_res)
+    
+     f = figure;
+     
+     alpha_level = 0.05;
+     
+     pre_val  = [];
+     post_val = [];
+     
+     for i = 1 : numel(fc_res)
+        pre_val = [pre_val cellfun(@get_Stats,fc_res{i}.Cpre)];
+        post_val = [post_val cellfun(@get_Stats,fc_res{i}.Cpost)];
+     end
+     
+     
+val    = [pre_val , post_val];
+labels = [repmat({'1) pre'},1,numel(pre_val)) , repmat({'2) post'},1,numel(post_val)), ...
+         ];
+
+violinplot(val,labels,'showMean',true); 
+
+[h,p] = kstest2(pre_val,post_val,'Tail','smaller','Alpha',alpha_level);
+
+if(p < alpha_level)
+    plot(1.5,0.3,'*','MarkerSize',18);
+end
+
+title(sprintf('gFC pre vs gFC post',p),'FontSize',16)
+ylabel('Global Connectivity','FontSize',14)
+
+
+
         
